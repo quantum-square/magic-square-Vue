@@ -6,6 +6,9 @@
       <span v-if="result.error">有错误</span>
     </template>
   </div>
+  <div class="info" v-else>
+    <span>Wait Start</span>
+  </div>
 </template>
 
 <script>
@@ -25,4 +28,16 @@ export default {
     }
   }
 };
+
 </script>
+
+<style lang="scss" scoped>
+.info {
+  position: absolute;
+  left: 120px;
+  top: 0px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #228cbd;
+}
+</style>

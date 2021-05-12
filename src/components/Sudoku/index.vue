@@ -21,7 +21,7 @@
 <script>
 import Info from "../Info";
 import Timer from "../Timer";
-import SelectBar from "../SelectBar";
+import SelectBar from "./components/SelectBar";
 import Board from "./components/Board";
 
 export default {

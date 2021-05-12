@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import EVENT from "../event";
+import EVENT from "../../../event";
 export default {
   props: {
     title: {

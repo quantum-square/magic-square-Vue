@@ -14,7 +14,7 @@
 
 <script>
 import NumberButton from "./NumberButton";
-import EVENT from "../event";
+import EVENT from "../../../event";
 export default {
   components: {
     NumberButton

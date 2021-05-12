@@ -36,7 +36,7 @@
         </a-col>
         <a-col :span="5">
           <span>Dimension </span>
-          <a-input-number :disabled="start" :default-value="dimension.value" size="small" :min="0" :max="20"
+          <a-input-number :disabled="start" :default-value="dimension.value" size="small" :min="1" :max="40"
                           @change="handleDimensionChange"/>
         </a-col>
         <a-col :span="5">
@@ -46,30 +46,39 @@
       </a-row>
     </div>
     <br/>
-    <Magic :config="config" :start="start" :stopped="stopped" :solver="solver" :dimension="dimension.value"
-           :showMouseHover="showMouseHover"/>
+    <div >
+      <a-row>
+        <a-col :span="2">
+          <a-space direction="vertical" class="buttonsBar">
+            <a-button :disabled="start" type="primary" class="paper-btn" @click="handleLoad">
+              Load
+            </a-button>
+            <br/>
+            <a-button type="primary" class="paper-btn" @click="handleSave">
+              Save
+            </a-button>
+            <br/>
+            <a-button :disabled="!start||!stopped" type="primary" class="paper-btn" @click="handleContinue">
+              Continue
+            </a-button>
+            <br/>
+            <a-button :disabled="!start||stopped" type="primary" class="paper-btn" @click="handleStop">
+              Stop
+            </a-button>
+            <br/>
+            <a-button :disabled="!start||!solver" type="primary" class="paper-btn" @click="handleFix">
+              Fix
+            </a-button>
+          </a-space>
+        </a-col>
+        <a-col :span="20">
+          <Magic :config="config" :start="start" :stopped="stopped" :solver="solver" :dimension="dimension.value"
+                 :showMouseHover="showMouseHover"/>
+        </a-col>
 
-    <a-space direction="vertical" class="buttonsBar">
-      <a-button :disabled="start" type="primary" class="paper-btn" @click="handleLoad">
-        Load
-      </a-button>
-      <br/>
-      <a-button type="primary" class="paper-btn" @click="handleSave">
-        Save
-      </a-button>
-      <br/>
-      <a-button :disabled="!start||!stopped" type="primary" class="paper-btn" @click="handleContinue">
-        Continue
-      </a-button>
-      <br/>
-      <a-button :disabled="!start||stopped" type="primary" class="paper-btn" @click="handleStop">
-        Stop
-      </a-button>
-      <br/>
-      <a-button :disabled="!start||!solver" type="primary" class="paper-btn" @click="handleFix">
-        Fix
-      </a-button>
-    </a-space>
+      </a-row>
+    </div>
+
   </div>
 </template>
 
@@ -77,7 +86,7 @@
 import Magic from "../../components/Magic";
 
 function validateDimensionNumber(number) {
-  if (0 <= number && number <= 20) {
+  if (0 <= number && number <= 40) {
     return {
       validateStatus: 'success',
       errorMsg: null,
@@ -172,14 +181,13 @@ export default {
   min-height: calc(100vh - 270px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  //justify-content: center;
+  //align-items: center;
 }
 
 .buttonsBar {
-  position: absolute;
-  left: 270px;
-  top: 350px;
+  margin-left: 0px;
+  margin-top: 100px;
   width: 100px;
 }
 

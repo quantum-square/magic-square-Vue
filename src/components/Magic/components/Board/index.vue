@@ -1,11 +1,11 @@
 <template>
-  <div class="board">
+  <div class="board" v-if="dimension<=40">
     <template v-for="(item, i) in dimension">
       <div class="row" :key="i">
         <template v-for="(item, j) in dimension">
           <Cell
               :control="getCellControl(i,j)"
-              :size=(500/dimension)
+              :size=(board_size/dimension)
               @eventCellClick="handleCellClickEvent"
               @eventMouseOver="handlCellMouseEvent"
               @eventMouseOut="handlCellMouseEvent"
@@ -67,6 +67,7 @@ export default {
   data() {
     return {
       cells: [],
+      board_size: 600
     };
   },
 
@@ -82,6 +83,13 @@ export default {
         }
       } else {
         this.gameOver();
+      }
+    },
+    dimension(val) {
+      if (1 <= val && val <= 20) {
+        this.board_size = 600;
+      } else if (val > 20 && val <= 40) {
+        this.board_size = 1500;
       }
     },
     model: {
@@ -222,35 +230,38 @@ export default {
           // 判断行，
           // 判断列，
           // 判断宫，
-          if (this.check(cell, num)) {
-            cell.number = num;
-            cell.disable = true;
-            break;
-          } else if (j === nums.length - 1) {
-            //判断格式尝试数量达到 9 次后重新洗牌再算；
-            const RESET_TIME = this.dimension;
-            if (oi === i) {
-              t++;
-            } else {
-              oi = i;
-              t = 0;
-            }
-            i = 0;
-            //重新洗牌
-            if (t % RESET_TIME == 0 && t != 0) {
-              i = -1;
-              j = 0;
-              for (let index = 0; index < cells.length; index++) {
-                let cell = cells[index];
-                cell.number = null;
-              }
-              //给一个固定值防止死循环
-            } else if (t >= 550) {
-              return;
-            }
-            // console.log(t);
-            break;
-          }
+          cell.number = num;
+          cell.disable = true;
+          break;
+          // if (this.check(cell, num)) {
+          //   cell.number = num;
+          //   cell.disable = true;
+          //   break;
+          // } else if (j === nums.length - 1) {
+          //   //判断格式尝试数量达到 9 次后重新洗牌再算；
+          //   const RESET_TIME = this.dimension;
+          //   if (oi === i) {
+          //     t++;
+          //   } else {
+          //     oi = i;
+          //     t = 0;
+          //   }
+          //   i = 0;
+          //   //重新洗牌
+          //   if (t % RESET_TIME == 0 && t != 0) {
+          //     i = -1;
+          //     j = 0;
+          //     for (let index = 0; index < cells.length; index++) {
+          //       let cell = cells[index];
+          //       cell.number = null;
+          //     }
+          //     //给一个固定值防止死循环
+          //   } else if (t >= 550) {
+          //     return;
+          //   }
+          //   // console.log(t);
+          //   break;
+          // }
         }
       }
 
@@ -323,11 +334,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.board {
-  position: relative;
-  left: 10px;
-  top: 100px;
-}
+
 
 .row {
   display: flex;
