@@ -1,7 +1,6 @@
 <template>
   <a-layout id="components-layout-demo-side" style="min-height: 100vh">
     <a-layout-sider v-model="collapsed" collapsible>
-      <div class="logo"/>
       <a-menu theme="dark" :default-selected-keys="['1']" mode="inline" :v-model="select_key" @click="select">
         <a-sub-menu key="magic">
           <span slot="title"><a-icon type="pie-chart"/><span>Soduku</span></span>
@@ -80,9 +79,4 @@ export default {
 </script>
 
 <style>
-#components-layout-demo-side .logo {
-  height: 32px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 16px;
-}
 </style>

@@ -3,7 +3,7 @@
     <a-page-header
         style="border: 1px solid rgb(235, 237, 240)"
         title="Matrix Puzzle Solver"
-        sub-title="CS 209 final rpoject"
+        sub-title="CS 209 final project"
     />
     <RootLayout/>
   </div>
