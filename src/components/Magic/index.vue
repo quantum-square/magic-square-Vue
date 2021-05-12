@@ -1,8 +1,25 @@
 <template>
   <div class="main">
-    <Timer :start="start" :stopped="stopped" :result="result" class="timer"/>
-    <Info :start="start" :result="result" class="info"/>
-    <a-divider/>
+    <a-row>
+      <a-col :span="5">
+        <Timer :start="start" :stopped="stopped" :result="result" class="timer"/>
+      </a-col>
+      <a-col :span="10">
+        <Info :start="start" :result="result" class="info"/>
+      </a-col>
+      <a-col :span="3">
+        <div class="info">
+          <span>Select:</span>
+        </div>
+      </a-col>
+      <a-col :span="2">
+        <a-input-number class="selectBar" :disabled="!(start&&!stopped&&!solver)" :min="0"
+                        :max="dimension*dimension"
+                        @change="handleNumberChange"/>
+      </a-col>
+    </a-row>
+    <a-divider class="line"/>
+
     <Board
         class="board"
         :start="start"
@@ -14,20 +31,18 @@
         @eventCellClick="handleCellClickEvent"
         @eventSudokuResult="handleResultEvent"
     />
-    <SelectBar :start="start&&!stopped&&!solver" :dimension="dimension" @eventNumberClick="handleButtonClick" class="selectBar"/>
+
   </div>
 </template>
 
 <script>
 import Info from "../Info";
 import Timer from "../Timer";
-import SelectBar from "../SelectBar";
 import Board from "./components/Board";
 
 
 export default {
   components: {
-    SelectBar,
     Board,
     Timer,
     Info
@@ -35,6 +50,7 @@ export default {
   data() {
     return {
       result: null,
+      number: '',
       boardModel: {
         selectCell: null,
         selectBarNumber: null
@@ -59,12 +75,12 @@ export default {
       default: false,
       required: true
     },
-    stopped:{
+    stopped: {
       type: Boolean,
       default: false,
       required: true
     },
-    solver:{
+    solver: {
       type: Boolean,
       default: false,
       required: true
@@ -85,6 +101,15 @@ export default {
       if (val == true) {
         this.boardModel.level = this.config.level;
       }
+    },
+    dimension(val) {
+      var board = document.getElementsByClassName("board")[0];
+      var big_board = document.getElementsByClassName("big-board")[0];
+      if (1 <= val && val <= 20 && big_board != null) {
+        big_board.setAttribute("class", "board");
+      } else if (val > 20 && val <= 40 && board != null) {
+        board.setAttribute("class", "big-board");
+      }
     }
   },
   beforeCreate() {
@@ -104,6 +129,12 @@ export default {
     handleButtonClick(number) {
       this.boardModel.selectBarNumber = number;
     },
+    handleNumberChange(value) {
+      if (value == "" || 1 <= value && value <= this.dimension * this.dimension) {
+        this.number = value;
+      }
+      this.boardModel.selectBarNumber = this.number;
+    }
   }
 };
 </script>
@@ -112,13 +143,12 @@ export default {
 .main {
   position: relative;
   width: 600px;
-  height: 580px;
-  //   border: 1px solid rgb(209, 207, 207);
+  height: 800px;
 }
 
 .info {
-  position: absolute;
-  left: 120px;
+  //position: absolute;
+  left: 0px;
   top: 0px;
   font-size: 18px;
   font-weight: bold;
@@ -126,7 +156,7 @@ export default {
 }
 
 .timer {
-  position: absolute;
+  position: relative;
   left: 0px;
   top: 0px;
 
@@ -134,23 +164,33 @@ export default {
   color: #a8a7a7;
 }
 
+.line {
+  top: -10px;
+  left: 0px;
+  width: 800px;
+}
+
 .board {
   position: absolute;
-  left: 40px;
-  top: 50px;
-  width: 500px;
-  height: 500px;
-  //   border: 1px solid #757575;
+
+  left: 50px;
+  top: 30px;
+  width: 600px;
+  height: 600px;
+  -webkit-transform: scale(0.875);
   background: #e6e6e6;
 }
 
-.selectBar {
-  position: absolute;
-  right: -100px;
-  top: 50px;
-  width: 100px;
+.big-board {
+  position: relative;
+  left: -400px;
+  top: -500px;
+  width: 1500px;
+  height: 1500px;
+  background: #e6e6e6;
+  -webkit-transform: scale(0.35);
 
-  //  background: #e6e6e6;
 }
+
 
 </style>
