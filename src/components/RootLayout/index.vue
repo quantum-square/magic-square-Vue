@@ -2,8 +2,8 @@
   <a-layout id="components-layout-demo-side" style="min-height: 100vh">
     <a-layout-sider v-model="collapsed" collapsible>
       <a-menu theme="dark" :default-selected-keys="['1']" mode="inline" :v-model="select_key" @click="select">
-        <a-sub-menu key="magic">
-          <span slot="title"><a-icon type="pie-chart"/><span>Soduku</span></span>
+        <a-sub-menu key="sudoku">
+          <span slot="title"><a-icon type="pie-chart"/><span>Sudoku</span></span>
           <a-menu-item key="Sudoku Game">
             Game
           </a-menu-item>
@@ -11,7 +11,7 @@
             Rule
           </a-menu-item>
         </a-sub-menu>
-        <a-sub-menu key="soduku">
+        <a-sub-menu key="magic">
           <span slot="title"><a-icon type="appstore-o"/><span>Magic Square</span></span>
           <a-menu-item key="Magic Game">
             Game

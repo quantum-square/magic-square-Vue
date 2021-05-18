@@ -42,11 +42,20 @@
     </div>
     <Sudoku :config="config" :start="start" :stopped="stopped" :solver="solver" :showMouseHover="showMouseHover"/>
     <a-space direction="vertical" class="buttonsBar">
-      <a-button :disabled="start" type="primary" class="paper-btn" @click="handleLoad">
-        Load
-      </a-button>
+      <a-upload
+          name="file"
+          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+          :headers="headers"
+          :file-list="fileList"
+          :disabled="start"
+          @change="handleLoadChange"
+      >
+        <a-button :disabled="start" type="primary" class="paper-btn">
+          Upload
+        </a-button>
+      </a-upload>
       <br/>
-      <a-button type="primary" class="paper-btn" @click="handleSave">
+      <a-button type="primary" :disabled="!stopped" class="paper-btn" @click="handleSave">
         Save
       </a-button>
       <br/>
@@ -73,6 +82,13 @@ export default {
   components: {
     Sudoku
   },
+  watch: {
+    start(val) {
+      if (val == true) {
+        this.boardModel.level = this.config.level;
+      }
+    },
+  },
   data() {
     return {
       config: {
@@ -82,7 +98,18 @@ export default {
       stopped: false,
       solver: false,
       value: null,
-      showMouseHover: true
+      showMouseHover: true,
+      headers: {
+        authorization: 'authorization-text',
+      },
+      fileList: [
+        {
+          uid: '-1',
+          name: 'xxx.png',
+          status: 'done',
+          url: 'http://www.baidu.com/xxx.png',
+        },
+      ],
     };
   },
   mounted() {
@@ -104,11 +131,44 @@ export default {
       this.start = false;
       this.stopped = true;
     },
-    handleLoad() {
+    handleLoadChange(info) {
+      let fileList = [...info.fileList];
+
+      // 1. Limit the number of uploaded files
+      //    Only to show two recent uploaded files, and old ones will be replaced by the new
+      fileList = fileList.slice(-1);
+
+      // 2. read from response and show file link
+      fileList = fileList.map(file => {
+        if (file.response) {
+          // Component will show file.url as link
+          file.url = file.response.url;
+        }
+        return file;
+      });
+
+      this.fileList = fileList;
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        this.$message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        this.$message.error(`${info.file.name} file upload failed.`);
+      }
 
     },
     handleSave() {
-
+      fetch('https://img-blog.csdnimg.cn/20181219151114979.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjQ4MTIzNA==,size_16,color_FFFFFF,t_70').then(res => res.blob()).then(blob => {
+        var a = document.createElement('a');
+        var url = window.URL.createObjectURL(blob);
+        var filename = 'myfile';
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
+      this.$message.warn("Download Log");
     },
     handleContinue() {
       if (this.start) {
@@ -123,7 +183,8 @@ export default {
     handleFix() {
     },
   }
-};
+}
+;
 </script>
 <style lang="scss" scoped>
 #together {
