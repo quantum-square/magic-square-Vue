@@ -47,5 +47,14 @@ export default {
   }
 };
 </script>
+<style>
+.ant-page-header-heading-title {
+  font-weight: bold !important;
+  font-size: 24px !important;
+}
+.ant-page-header-heading-sub-title {
+  font-size: 16px !important;
+}
+</style>
 
 

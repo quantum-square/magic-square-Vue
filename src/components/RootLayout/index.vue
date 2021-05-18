@@ -25,7 +25,7 @@
     <a-layout>
       <a-layout-content style="margin: 0 16px">
         <a-breadcrumb style="margin: 16px 0">
-          <a-breadcrumb-item>{{ $route.name }}</a-breadcrumb-item>
+          <a-breadcrumb-item class="ruleHead">{{ $route.name }}</a-breadcrumb-item>
         </a-breadcrumb>
         <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
           <router-view
@@ -78,5 +78,13 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
+.ruleHead {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c6fbb !important;
+}
+.ant-breadcrumb{
+  text-align: center !important;
+}
 </style>
