@@ -197,11 +197,7 @@ export default {
       this.$message.warn("Download Log");
     },
     handleContinue() {
-      if (this.start) {
-        this.stopped = false;
-      } else {
-        this.stopped = true;
-      }
+      this.stopped = !this.start;
     },
     handleStop() {
       this.stopped = true;
