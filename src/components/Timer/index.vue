@@ -84,7 +84,10 @@ export default {
     reset() {
       clearInterval(this.timer);
       this.timer = null;
-      this.$refs.startTimer.innerHTML = null;
+
+      if (this.$refs.startTimer != null) {
+        this.$refs.startTimer.innerHTML = null;
+      }
       this.hour = 0;
       this.minutes = 0;
       this.seconds = 0;
