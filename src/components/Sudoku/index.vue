@@ -36,7 +36,8 @@ export default {
       result: null,
       boardModel: {
         selectCell: null,
-        selectBarNumber: null
+        selectBarNumber: null,
+        level:1
       },
       selectBarModel: {
         able: false

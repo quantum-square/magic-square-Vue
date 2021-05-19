@@ -82,13 +82,7 @@ export default {
   components: {
     Sudoku
   },
-  watch: {
-    start(val) {
-      if (val == true) {
-        this.boardModel.level = this.config.level;
-      }
-    },
-  },
+
   data() {
     return {
       config: {
