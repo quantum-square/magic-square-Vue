@@ -10,8 +10,11 @@
         :solver="solver"
         :showMouseHover="showMouseHover"
         :model="boardModel"
+        :boardData="boardData"
         @eventCellClick="handleCellClickEvent"
         @eventSudokuResult="handleResultEvent"
+        :indicationToGetCurBoard="indicationToGetCurBoard"
+        @eventCurrentBoardFromBoard="getCurBoardFromBoard"
     />
     <SelectBar :dimension="9" :start="start&&!stopped&&!solver" @eventNumberClick="handleButtonClick" class="selectBar"/>
 
@@ -23,6 +26,7 @@ import Info from "../Info";
 import Timer from "../Timer";
 import SelectBar from "./components/SelectBar";
 import Board from "./components/Board";
+import EVENT from "../event";
 
 export default {
   components: {
@@ -43,6 +47,8 @@ export default {
         able: false
       }
     };
+  },
+  created() {
   },
   props: {
     config: {
@@ -73,6 +79,13 @@ export default {
       type: Boolean,
       default: true,
       required: false
+    },
+    boardData: {
+      type: Array,
+      required: false,
+    },
+    indicationToGetCurBoard: {
+      type: Boolean
     }
   },
   watch: {
@@ -98,6 +111,10 @@ export default {
     },
     handleButtonClick(number) {
       this.boardModel.selectBarNumber = number;
+    },
+    getCurBoardFromBoard(BoardData) {
+      console.log('trigger getCurBoardFromBoard')
+      this.$emit(EVENT.CURRENT_BOARD_FROM_Sudoku, BoardData);
     }
   }
 };

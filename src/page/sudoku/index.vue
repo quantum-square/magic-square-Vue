@@ -7,18 +7,16 @@
               type="primary"
               :disabled="start"
               size="small"
-              @click="handleStartClick"
-          >Start
-          </a-button
-          >
+              @click="handleStartClick">
+            Start
+          </a-button>
           <a-button
               type="primary"
               :disabled="!start"
               size="small"
-              @click="handleEndClick"
-          >End
-          </a-button
-          >
+              @click="handleEndClick">
+            End
+          </a-button>
         </a-col>
 
         <a-col :span="8">
@@ -40,7 +38,16 @@
         </a-col>
       </a-row>
     </div>
-    <Sudoku :config="config" :start="start" :stopped="stopped" :solver="solver" :showMouseHover="showMouseHover"/>
+    <Sudoku
+        :config="config"
+        :start="start"
+        :stopped="stopped"
+        :solver="solver"
+        :showMouseHover="showMouseHover"
+        :boardData="boardDataToBoard"
+        :indicationToGetCurBoard="indicationToGetCurBoard"
+        @eventCurrentBoardFromSudoku="getCurBoardFromSudoku"
+    />
     <a-space direction="vertical" class="buttonsBar">
       <a-upload
           name="file"
@@ -55,7 +62,7 @@
         </a-button>
       </a-upload>
       <br/>
-      <a-button type="primary" :disabled="!stopped" class="paper-btn" @click="handleSave">
+      <a-button :disabled="!start||!stopped" type="primary" class="paper-btn" @click="handleSave">
         Save
       </a-button>
       <br/>
@@ -67,8 +74,9 @@
         Stop
       </a-button>
       <br/>
-      <a-button :disabled="!start||!solver" type="primary" class="paper-btn" @click="handleFix">
-        Fix
+      <!-- TODO -->
+      <a-button :disabled="!start||!solver" type="primary" class="paper-btn" @click="handleDownload">
+        Download
       </a-button>
     </a-space>
   </div>
@@ -76,13 +84,13 @@
 
 <script>
 import Sudoku from "../../components/Sudoku";
+import EVENT from "../../components/event";
 
 export default {
   name: "App",
   components: {
     Sudoku
   },
-
   data() {
     return {
       config: {
@@ -104,26 +112,89 @@ export default {
           url: 'http://www.baidu.com/xxx.png',
         },
       ],
+      taskid: -1,
+      ws: null,
+      backend_wb_path: 'ws://127.0.0.1:8000/syncBoard/',
+      boardDataToBoard: null,
+      indicationToGetCurBoard: false,
+      boardDataFromBoard: null,
     };
   },
+  watch: {
+
+  },
   mounted() {
+    this.taskid = -1;
+    this.ws = null;
+    this.start = false;
+    this.solver = false;
+  },
+  destroyed() {
+    this.ws.close();
   },
   methods: {
     // moment,
+    // TODO: modify the name
     handleChange(e) {
       console.log(`checked = ${e.target.value}`);
       this.config.level = e.target.value;
     },
     onChangeSolver(value) {
-      this.solver = value;
+      if (!this.start) {
+        this.solver = value;
+      }
+      else {
+        if (this.solver) {
+          this.solver = value;
+          this.taskid = -1;
+
+          // close websocket
+          if (this.ws != null) {
+            this.ws.close();
+            this.ws = null;
+          }
+        }
+        else {
+          this.solver = value;
+          this.getCurBoard();
+          this.$nextTick( function () {
+            console.log("hello");
+            this.createTask();
+          })
+        }
+      }
     },
     handleStartClick() {
       this.start = true;
       this.stopped = false;
+
+      if (this.solver) {
+        this.getCurBoard();
+        this.$nextTick( function () {
+          console.log("hello");
+          this.createTask();
+        })
+      }
     },
     handleEndClick() {
       this.start = false;
       this.stopped = true;
+
+      if (this.ws != null) {
+        this.$axios.post('/stop/', {
+          taskId: this.taskid,
+        }).then(res =>
+        {
+          console.log('stop success!');
+        }).catch(err =>
+        {
+          console.log(err);
+        });
+
+        this.ws.close();
+      }
+      this.ws = null;
+      this.taskid = -1;
     },
     handleLoadChange(info) {
       let fileList = [...info.fileList];
@@ -163,18 +234,123 @@ export default {
         window.URL.revokeObjectURL(url);
       });
       this.$message.warn("Download Log");
+
     },
     handleContinue() {
       if (this.start) {
         this.stopped = false;
-      } else {
-        this.stopped = true;
+        if (this.taskid !== -1) {
+          this.$axios.get('/state/'+this.taskid)
+              .then(res => {
+                console.log(res.data);
+                let str = res.data;
+                let url = '';
+                if (str === 'NEW') url = '/start/';
+                else if (str === 'SUSPEND') url = '/resume/';
+
+                this.$axios.post(url, {
+                  taskId: this.taskid,
+                }).then(res => {
+                  console.log('task ' + this.taskid + ' ' + url + ' resume success')
+                }).catch(err => {
+                  console.log(err);
+                })
+              })
+              .catch(err => {
+                console.log(err);
+              })
+        }
       }
     },
     handleStop() {
+      if (this.solver) {
+        this.$axios.post('/suspend/', {
+          taskId: this.taskid,
+        }).then(res => {
+          console.log('task ' + this.taskid + ' suspend success!');
+        }).catch(err => {
+          console.log(err);
+        });
+      }
       this.stopped = true;
     },
-    handleFix() {
+    handleDownload() {
+      // TODO
+    },
+    getCurBoard() {
+      console.log('getCurBoard start', this.boardDataFromBoard);
+      let boardDataFromBoardTemp = this.boardDataFromBoard;
+      this.indicationToGetCurBoard = !this.indicationToGetCurBoard;
+      // while (this.boardDataFromBoard === boardDataFromBoardTemp) {i++;}
+      console.log('getCurBoard end', this.boardDataFromBoard);
+      return this.boardDataFromBoard;
+    },
+    setCurBoard(data) {
+      this.boardDataToBoard = data;
+    },
+    getCurBoardFromSudoku(BoardData) {
+      console.log('trigger getCurBoardFromSudoku')
+      this.boardDataFromBoard = BoardData;
+    },
+    webSocketInit() {
+      this.webSocketInitInside();
+    },
+    startTask() {
+      this.$axios.post('/start/', {
+        taskId: this.taskid,
+      }).then(res => {
+        console.log('start task', res);
+        console.log('task ' + this.taskid + ' start success');
+      }).catch(err => {
+        console.log(err);
+      })
+    },
+    webSocketInitInside() {
+      console.log('try to connect websocket');
+      let self = this;
+      this.ws = new WebSocket(this.backend_wb_path + this.taskid);
+      this.ws.onopen = function (event) {
+        console.log('websocket open:', event);
+      }
+      this.ws.onmessage = function (event) {
+        console.log('onmessage', event);
+        let dataUpdate = JSON.parse(event.data);
+
+        if (dataUpdate['board'] !== null) {
+          self.boardDataToBoard = dataUpdate['board'];
+          console.log('assign boardDataToBoard success in sudoku', self.boardDataToBoard)
+        }
+        else {
+          console.log("it is null")
+        }
+      }
+      this.ws.onclose = function (event) {
+        console.log('websocket disconnect', event);
+      }
+      this.ws.onerror = function (err) {
+        console.log(err);
+      }
+    },
+    createTask() {
+      let boarddata = this.boardDataFromBoard;
+
+      this.$axios.post('/sdk/create/', {
+        board: boarddata,
+      }).then(res => {
+        console.log('create res', res);
+
+        this.taskid = res.data['taskId'];
+        console.log('create task ' + this.taskid + ' success!');
+
+        this.webSocketInit();
+
+        if (!this.stopped) {
+          this.startTask();
+        }
+
+      }).catch(err => {
+        console.log(err);
+      });
     },
   }
 }
