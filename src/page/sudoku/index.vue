@@ -47,6 +47,7 @@
         :boardData="boardDataToBoard"
         :indicationToGetCurBoard="indicationToGetCurBoard"
         @eventCurrentBoardFromSudoku="getCurBoardFromSudoku"
+        @eventSudokuResult="handleResultEvent"
     />
     <a-space direction="vertical" class="buttonsBar">
       <a-upload
@@ -78,6 +79,9 @@
       <a-button :disabled="!start||!solver" type="primary" class="paper-btn" @click="handleDownload">
         Download
       </a-button>
+      <a-button :disabled ="!solver && (!start || !stopped)"> Load Puzzle </a-button>
+      <a-button :disabled ="!solver && (!start || !stopped || result.success)"> Save Puzzle </a-button>
+      <a-button :disabled ="!solver && !start"> Download Original Puzzle</a-button>
     </a-space>
   </div>
 </template>
@@ -118,6 +122,7 @@ export default {
       boardDataToBoard: null,
       indicationToGetCurBoard: false,
       boardDataFromBoard: null,
+      result: null,
     };
   },
   watch: {
@@ -133,6 +138,11 @@ export default {
     this.ws.close();
   },
   methods: {
+    handleResultEvent(result) {
+      //{total: 15, empty: 14, error: 0, success: false}
+      this.result = result;
+      // console.log(result);
+    },
     // moment,
     // TODO: modify the name
     handleChange(e) {
@@ -158,7 +168,6 @@ export default {
           this.solver = value;
           this.getCurBoard();
           this.$nextTick( function () {
-            console.log("hello");
             this.createTask();
           })
         }
@@ -171,7 +180,6 @@ export default {
       if (this.solver) {
         this.getCurBoard();
         this.$nextTick( function () {
-          console.log("hello");
           this.createTask();
         })
       }
@@ -224,7 +232,8 @@ export default {
 
     },
     handleSave() {
-      fetch('https://img-blog.csdnimg.cn/20181219151114979.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjQ4MTIzNA==,size_16,color_FFFFFF,t_70').then(res => res.blob()).then(blob => {
+      fetch('https://img-blog.csdnimg.cn/20181219151114979.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjQ4MTIzNA==,size_16,color_FFFFFF,t_70')
+          .then(res => res.blob()).then(blob => {
         var a = document.createElement('a');
         var url = window.URL.createObjectURL(blob);
         var filename = 'myfile';

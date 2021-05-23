@@ -104,6 +104,7 @@ export default {
       //{total: 15, empty: 14, error: 0, success: false}
       this.result = result;
       // console.log(result);
+      this.$emit(EVENT.SUDOKU_RESULT, this.result);
     },
     handleCellClickEvent(cell) {
       this.boardModel.selectCell = cell;
