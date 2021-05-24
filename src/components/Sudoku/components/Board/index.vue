@@ -62,6 +62,10 @@ export default {
     },
     indicationToGetCurBoard: {
       type: Boolean
+    },
+    boardDataLoadedToBoard: {
+      type: Object,
+      default: null,
     }
   },
 
@@ -86,7 +90,7 @@ export default {
     },
     model: {
       handler: function () {
-        this.cellwriteNumber();
+        this.cellWriteNumber();
         this.sendResult();
       },
       deep: true
@@ -109,16 +113,34 @@ export default {
     },
     indicationToGetCurBoard: {
       handler: function () {
-        console.log('Board want to get current board');
+        console.log('want to get current board in Board');
 
         let BoardData = [];
+        let disable = [];
         for (let i = 0; i < this.row; i++) {
           BoardData[i] = [];
+          disable[i] = [];
           for (let j = 0; j < this.col; j++) {
             BoardData[i][j] = this.cells[i*this.row+j].number == null ? 0 : this.cells[i*this.row+j].number;
+            disable[i][j] = this.cells[i*this.row+j].disable ? 1 : 0;
           }
         }
-        this.$emit(EVENT.CURRENT_BOARD_FROM_Board, BoardData)
+        let obj = {'board':BoardData, 'disable':disable};
+        this.$emit(EVENT.CURRENT_BOARD_FROM_Board, obj);
+      }
+    },
+    // TODO:有点问题问题在哪我不知道嘻嘻（load之后开solver最后timer行为不正常）
+    boardDataLoadedToBoard: {
+      handler: function () {
+        console.log('Board know what to load', this.boardDataLoadedToBoard);
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 9; j++) {
+            this.cells[i*9+j]['disable'] = this.boardDataLoadedToBoard['disable'][i][j] === 1;
+            this.cells[i*9+j]['number'] = this.boardDataLoadedToBoard['board'][i][j];
+          }
+        }
+        console.log(this.cells)
+        this.sendResult();
       }
     }
   },
@@ -178,7 +200,6 @@ export default {
 
       // console.log("gameOver", this.cells);
     },
-
     //判断属于哪个宫 B1,B2,B3...B9
     whichBox(x, y) {
       let r = parseInt(x / 3) + "" + parseInt(y / 3);
@@ -224,7 +245,6 @@ export default {
       }
       return true;
     },
-
     //生成随机号码串
     randomNumbers(arr = [], length = 1) {
       var result = [];
@@ -235,7 +255,6 @@ export default {
       }
       return result;
     },
-
     //按等级生成随机数字
     generateGame(level = 1) {
       let t = 0;
@@ -303,9 +322,8 @@ export default {
         return item.x === x && item.y === y;
       });
     },
-
     //写入选中号码
-    cellwriteNumber() {
+    cellWriteNumber() {
       let {cells, model} = this;
       for (let index = 0; index < cells.length; index++) {
         let cell = cells[index];
@@ -314,7 +332,6 @@ export default {
         cell.number = cell.selected ? number : cell.number;
       }
     },
-
     // 更新所有cells
     updateAllCells() {
       console.log("updateAllCells", this.boardData);
@@ -335,7 +352,6 @@ export default {
         cell.selected = cell.x == x && cell.y == y ? true : false;
       }
     },
-
     //显示鼠标经过的方格的当前列和当前行
     showCellsMouseHover(x = null, y = null) {
       let {cells} = this;
@@ -344,8 +360,7 @@ export default {
         cell.hover = cell.x == x || cell.y == y ? true : false;
       }
     },
-
-    // 获得cells中值为0cell的数量
+    // 获得cells中值为0的cell的数量
     getDefectCell() {
       let {cells} = this;
       return cells.reduce((prev, cell) => {

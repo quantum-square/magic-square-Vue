@@ -312,7 +312,7 @@ export default {
         return prev;
       }, 0);
     },
-    handlCellMouseEvent(cell) {
+    handleCellMouseEvent(cell) {
       if (!this.start || this.stopped || this.solver) return;
       if (cell) {
         if (this.showMouseHover) {

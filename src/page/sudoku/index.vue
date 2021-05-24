@@ -3,18 +3,10 @@
     <div class="mean">
       <a-row>
         <a-col :span="6">
-          <a-button
-              type="primary"
-              :disabled="start"
-              size="small"
-              @click="handleStartClick">
+          <a-button type="primary" :disabled="start" size="small" @click="handleStartClick">
             Start
           </a-button>
-          <a-button
-              type="primary"
-              :disabled="!start"
-              size="small"
-              @click="handleEndClick">
+          <a-button type="primary" :disabled="!start" size="small" @click="handleEndClick">
             End
           </a-button>
         </a-col>
@@ -48,40 +40,36 @@
         :indicationToGetCurBoard="indicationToGetCurBoard"
         @eventCurrentBoardFromSudoku="getCurBoardFromSudoku"
         @eventSudokuResult="handleResultEvent"
+        :boardDataLoadedToBoard="boardDataLoadedToBoard"
     />
     <a-space direction="vertical" class="buttonsBar">
-      <a-upload
-          name="file"
-          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-          :headers="headers"
-          :file-list="fileList"
-          :disabled="start"
-          @change="handleLoadChange"
-      >
-        <a-button :disabled="start" type="primary" class="paper-btn">
-          Upload
-        </a-button>
-      </a-upload>
-      <br/>
-      <a-button :disabled="!start||!stopped" type="primary" class="paper-btn" @click="handleSave">
-        Save
-      </a-button>
-      <br/>
       <a-button :disabled="!start||!stopped" type="primary" class="paper-btn" @click="handleContinue">
         Continue
-      </a-button>
-      <br/>
-      <a-button :disabled="!start||stopped" type="primary" class="paper-btn" @click="handleStop">
+      </a-button><br/>
+      <a-button :disabled="!start||stopped||result.success" type="primary" class="paper-btn" @click="handleStop">
         Stop
+      </a-button><br/>
+<!--      <a-upload-->
+<!--          name="file"-->
+<!--          :disabled="start"-->
+<!--          :multiple="false"-->
+<!--          @change="handleLoad"-->
+<!--      >-->
+<!--        <a-button :disabled="!(!solver && start && stopped)" type="primary" class="paper-btn">-->
+<!--          <a-icon type="upload" />-->
+<!--          Load Puzzle-->
+<!--        </a-button>-->
+<!--      </a-upload><br/>-->
+      <a-button :disabled="!(!solver && start && stopped)" type="primary" class="paper-btn" id="fileImport" @click="handleLoad">
+        Load Puzzle
       </a-button>
-      <br/>
-      <!-- TODO -->
-      <a-button :disabled="!start||!solver" type="primary" class="paper-btn" @click="handleDownload">
-        Download
+      <input type="file" id="files" ref="refFile" style="display: none" v-on:change="handleFileChange"/><br/>
+      <a-button :disabled="!(!solver && start)" type="primary" class="paper-btn" @click="handleSave">
+        Save Puzzle
+      </a-button><br/>
+      <a-button :disabled="!(!solver && start)" type="primary" class="paper-btn" @click="handleDownload">
+        Download Original Puzzle
       </a-button>
-      <a-button :disabled ="!solver && (!start || !stopped)"> Load Puzzle </a-button>
-      <a-button :disabled ="!solver && (!start || !stopped || result.success)"> Save Puzzle </a-button>
-      <a-button :disabled ="!solver && !start"> Download Original Puzzle</a-button>
     </a-space>
   </div>
 </template>
@@ -89,6 +77,8 @@
 <script>
 import Sudoku from "../../components/Sudoku";
 import EVENT from "../../components/event";
+import { UploadOutlined } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
 
 export default {
   name: "App",
@@ -123,6 +113,7 @@ export default {
       indicationToGetCurBoard: false,
       boardDataFromBoard: null,
       result: null,
+      boardDataLoadedToBoard: null,
     };
   },
   watch: {
@@ -135,7 +126,7 @@ export default {
     this.solver = false;
   },
   destroyed() {
-    this.ws.close();
+    if (this.ws !== null) this.ws.close();
   },
   methods: {
     handleResultEvent(result) {
@@ -175,7 +166,7 @@ export default {
     },
     handleStartClick() {
       this.start = true;
-      this.stopped = false;
+      this.stopped = true;
 
       if (this.solver) {
         this.getCurBoard();
@@ -204,46 +195,68 @@ export default {
       this.ws = null;
       this.taskid = -1;
     },
-    handleLoadChange(info) {
-      let fileList = [...info.fileList];
+    handleLoad() {
+      // let fileList = [...info.fileList];
+      //
+      // // 1. Limit the number of uploaded files
+      // //    Only to show two recent uploaded files, and old ones will be replaced by the new
+      // fileList = fileList.slice(-1);
+      //
+      // // 2. read from response and show file link
+      // fileList = fileList.map(file => {
+      //   if (file.response) {
+      //     // Component will show file.url as link
+      //     file.url = file.response.url;
+      //   }
+      //   return file;
+      // });
+      //
+      // this.fileList = fileList;
+      // if (info.file.status !== 'uploading') {
+      //   console.log(info.file, info.fileList);
+      // }
+      // if (info.file.status === 'done') {
+      //   this.$message.success(`${info.file.name} file uploaded successfully`);
+      // } else if (info.file.status === 'error') {
+      //   this.$message.error(`${info.file.name} file upload failed.`);
+      // }
 
-      // 1. Limit the number of uploaded files
-      //    Only to show two recent uploaded files, and old ones will be replaced by the new
-      fileList = fileList.slice(-1);
+      // if (info.file.status !== 'uploading') {
+      //   console.log(info.file, info.fileList);
+      // }
+      //
+      // if (info.file.status === 'done') {
+      //   message.success(`${info.file.name} file uploaded successfully`);
+      // } else if (info.file.status === 'error') {
+      //   message.error(`${info.file.name} file upload failed.`);
+      // }
+      this.$refs.refFile.dispatchEvent(new MouseEvent('click'))
+    },
+    handleFileChange() {
+      let that = this;
+      const selectedFile = this.$refs.refFile.files[0];
+      const reader = new FileReader();
+      reader.readAsText(selectedFile);
+      reader.onload = function() {
+        let data = this.result;
+        that.boardDataLoadedToBoard = JSON.parse(data);
 
-      // 2. read from response and show file link
-      fileList = fileList.map(file => {
-        if (file.response) {
-          // Component will show file.url as link
-          file.url = file.response.url;
-        }
-        return file;
-      });
-
-      this.fileList = fileList;
-      if (info.file.status !== 'uploading') {
-        console.log(info.file, info.fileList);
       }
-      if (info.file.status === 'done') {
-        this.$message.success(`${info.file.name} file uploaded successfully`);
-      } else if (info.file.status === 'error') {
-        this.$message.error(`${info.file.name} file upload failed.`);
-      }
-
     },
     handleSave() {
-      fetch('https://img-blog.csdnimg.cn/20181219151114979.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjQ4MTIzNA==,size_16,color_FFFFFF,t_70')
-          .then(res => res.blob()).then(blob => {
+      let that = this;
+      this.getCurBoard();
+      this.$nextTick(function () {
+        let data = JSON.stringify(that.boardDataFromBoard);
+        let blob = new Blob([data], {type: 'application/json'});
         var a = document.createElement('a');
         var url = window.URL.createObjectURL(blob);
-        var filename = 'myfile';
+        var filename = new Date().getTime().toString();
         a.href = url;
         a.download = filename;
         a.click();
         window.URL.revokeObjectURL(url);
-      });
-      this.$message.warn("Download Log");
-
+      })
     },
     handleContinue() {
       if (this.start) {
@@ -284,7 +297,27 @@ export default {
       this.stopped = true;
     },
     handleDownload() {
-      // TODO
+      let that = this;
+      this.getCurBoard();
+      this.$nextTick(function () {
+        let data = that.boardDataFromBoard;
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 9; j++) {
+            if (data['disable'][i][j] === 0) {
+              data['board'][i][j] = 0;
+            }
+          }
+        }
+        data = JSON.stringify(data);
+        let blob = new Blob([data], {type: 'application/json'});
+        var a = document.createElement('a');
+        var url = window.URL.createObjectURL(blob);
+        var filename = 'Ori' + new Date().getTime().toString();
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
     },
     getCurBoard() {
       console.log('getCurBoard start', this.boardDataFromBoard);
@@ -341,7 +374,7 @@ export default {
       }
     },
     createTask() {
-      let boarddata = this.boardDataFromBoard;
+      let boarddata = this.boardDataFromBoard['board'];
 
       this.$axios.post('/sdk/create/', {
         board: boarddata,

@@ -15,6 +15,7 @@
         @eventSudokuResult="handleResultEvent"
         :indicationToGetCurBoard="indicationToGetCurBoard"
         @eventCurrentBoardFromBoard="getCurBoardFromBoard"
+        :boardDataLoadedToBoard="boardDataLoadedToBoard"
     />
     <SelectBar :dimension="9" :start="start&&!stopped&&!solver" @eventNumberClick="handleButtonClick" class="selectBar"/>
 
@@ -86,6 +87,10 @@ export default {
     },
     indicationToGetCurBoard: {
       type: Boolean
+    },
+    boardDataLoadedToBoard: {
+      type:Object,
+      default: null
     }
   },
   watch: {
@@ -114,7 +119,7 @@ export default {
       this.boardModel.selectBarNumber = number;
     },
     getCurBoardFromBoard(BoardData) {
-      console.log('trigger getCurBoardFromBoard')
+      console.log('trigger getCurBoardFromBoard in Sudoku')
       this.$emit(EVENT.CURRENT_BOARD_FROM_Sudoku, BoardData);
     }
   }
