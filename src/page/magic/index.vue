@@ -3,32 +3,16 @@
     <div class="mean">
       <a-row>
         <a-col :span="5">
-          <a-button
-              type="primary"
-              :disabled="start"
-              size="small"
-              @click="handleStartClick"
-          >Start
-          </a-button
-          >
-          <a-button
-              type="primary"
-              :disabled="!start"
-              size="small"
-              @click="handleEndClick"
-          >End
-          </a-button
-          >
+          <a-button type="primary" :disabled="start" size="small" @click="handleStartClick">
+            Start
+          </a-button>
+          <a-button type="primary" :disabled="!start" size="small" @click="handleEndClick">
+            End
+          </a-button>
         </a-col>
 
         <a-col :span="5">
-          <a-radio-group
-              size="small"
-              buttonStyle="solid"
-              v-model="config.level"
-              :disabled="start"
-              @change="handleChange"
-          >
+          <a-radio-group size="small" buttonStyle="solid" v-model="config.level" :disabled="start" @change="handleChange">
             <a-radio-button value="1">Easy</a-radio-button>
             <a-radio-button value="2">Normal</a-radio-button>
             <a-radio-button value="3">Hard</a-radio-button>
@@ -65,23 +49,24 @@
             <br/>
             <a-button type="primary" :disabled="!stopped" class="paper-btn" @click="handleSave">
               Save
-            </a-button>
-            <br/>
+            </a-button><br/>
             <a-button :disabled="!start||!stopped" type="primary" class="paper-btn" @click="handleContinue">
               Continue
-            </a-button>
-            <br/>
+            </a-button><br/>
             <a-button :disabled="!start||stopped" type="primary" class="paper-btn" @click="handleStop">
               Stop
-            </a-button>
-            <br/>
+            </a-button><br/>
             <a-button :disabled="!start||!solver" type="primary" class="paper-btn" @click="handleFix">
               Fix
             </a-button>
           </a-space>
         </a-col>
         <a-col :span="20">
-          <Magic :config="config" :start="start" :stopped="stopped" :solver="solver" :dimension="dimension.value"
+          <Magic :config="config"
+                 :start="start"
+                 :stopped="stopped"
+                 :solver="solver"
+                 :dimension="dimension.value"
                  :showMouseHover="showMouseHover"/>
         </a-col>
 
@@ -151,50 +136,17 @@ export default {
     },
     handleStartClick() {
       this.start = true;
-      this.stopped = false;
+      this.stopped = true;
     },
     handleEndClick() {
       this.start = false;
       this.stopped = true;
     },
     handleLoadChange(info) {
-      let fileList = [...info.fileList];
-
-      // 1. Limit the number of uploaded files
-      //    Only to show two recent uploaded files, and old ones will be replaced by the new
-      fileList = fileList.slice(-1);
-
-      // 2. read from response and show file link
-      fileList = fileList.map(file => {
-        if (file.response) {
-          // Component will show file.url as link
-          file.url = file.response.url;
-        }
-        return file;
-      });
-
-      this.fileList = fileList;
-      if (info.file.status !== 'uploading') {
-        console.log(info.file, info.fileList);
-      }
-      if (info.file.status === 'done') {
-        this.$message.success(`${info.file.name} file uploaded successfully`);
-      } else if (info.file.status === 'error') {
-        this.$message.error(`${info.file.name} file upload failed.`);
-      }
 
     },
     handleSave() {
-      fetch('https://img-blog.csdnimg.cn/20181219151114979.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MjQ4MTIzNA==,size_16,color_FFFFFF,t_70').then(res => res.blob()).then(blob => {
-        var a = document.createElement('a');
-        var url = window.URL.createObjectURL(blob);
-        var filename = 'myfile';
-        a.href = url;
-        a.download = filename;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      });
-      this.$message.warn("Download Log");
+
     },
     handleContinue() {
       this.stopped = !this.start;

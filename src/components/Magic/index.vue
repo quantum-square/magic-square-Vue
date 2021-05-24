@@ -29,8 +29,7 @@
         :model="boardModel"
         :dimension="dimension"
         @eventCellClick="handleCellClickEvent"
-        @eventSudokuResult="handleResultEvent"
-    />
+        @eventSudokuResult="handleResultEvent"/>
 
   </div>
 </template>
@@ -99,7 +98,7 @@ export default {
   },
   watch: {
     start(val) {
-      if (val == true) {
+      if (val === true) {
         this.boardModel.level = this.config.level;
       }
     },

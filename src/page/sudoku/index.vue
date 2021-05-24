@@ -49,17 +49,6 @@
       <a-button :disabled="!start||stopped||result.success" type="primary" class="paper-btn" @click="handleStop">
         Stop
       </a-button><br/>
-<!--      <a-upload-->
-<!--          name="file"-->
-<!--          :disabled="start"-->
-<!--          :multiple="false"-->
-<!--          @change="handleLoad"-->
-<!--      >-->
-<!--        <a-button :disabled="!(!solver && start && stopped)" type="primary" class="paper-btn">-->
-<!--          <a-icon type="upload" />-->
-<!--          Load Puzzle-->
-<!--        </a-button>-->
-<!--      </a-upload><br/>-->
       <a-button :disabled="!(!solver && start && stopped)" type="primary" class="paper-btn" id="fileImport" @click="handleLoad">
         Load Puzzle
       </a-button>
@@ -196,40 +185,6 @@ export default {
       this.taskid = -1;
     },
     handleLoad() {
-      // let fileList = [...info.fileList];
-      //
-      // // 1. Limit the number of uploaded files
-      // //    Only to show two recent uploaded files, and old ones will be replaced by the new
-      // fileList = fileList.slice(-1);
-      //
-      // // 2. read from response and show file link
-      // fileList = fileList.map(file => {
-      //   if (file.response) {
-      //     // Component will show file.url as link
-      //     file.url = file.response.url;
-      //   }
-      //   return file;
-      // });
-      //
-      // this.fileList = fileList;
-      // if (info.file.status !== 'uploading') {
-      //   console.log(info.file, info.fileList);
-      // }
-      // if (info.file.status === 'done') {
-      //   this.$message.success(`${info.file.name} file uploaded successfully`);
-      // } else if (info.file.status === 'error') {
-      //   this.$message.error(`${info.file.name} file upload failed.`);
-      // }
-
-      // if (info.file.status !== 'uploading') {
-      //   console.log(info.file, info.fileList);
-      // }
-      //
-      // if (info.file.status === 'done') {
-      //   message.success(`${info.file.name} file uploaded successfully`);
-      // } else if (info.file.status === 'error') {
-      //   message.error(`${info.file.name} file upload failed.`);
-      // }
       this.$refs.refFile.dispatchEvent(new MouseEvent('click'))
     },
     handleFileChange() {
@@ -323,7 +278,6 @@ export default {
       console.log('getCurBoard start', this.boardDataFromBoard);
       let boardDataFromBoardTemp = this.boardDataFromBoard;
       this.indicationToGetCurBoard = !this.indicationToGetCurBoard;
-      // while (this.boardDataFromBoard === boardDataFromBoardTemp) {i++;}
       console.log('getCurBoard end', this.boardDataFromBoard);
       return this.boardDataFromBoard;
     },

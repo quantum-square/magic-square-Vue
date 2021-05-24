@@ -7,8 +7,8 @@
               :control="getCellControl(i,j)"
               :size=(board_size/dimension)
               @eventCellClick="handleCellClickEvent"
-              @eventMouseOver="handlCellMouseEvent"
-              @eventMouseOut="handlCellMouseEvent"
+              @eventMouseOver="handleCellMouseEvent"
+              @eventMouseOut="handleCellMouseEvent"
               :key="`${i}-${j}`"
           />
         </template>
