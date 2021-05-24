@@ -38,7 +38,7 @@
         :showMouseHover="showMouseHover"
         :boardData="boardDataToBoard"
         :indicationToGetCurBoard="indicationToGetCurBoard"
-        @eventCurrentBoardFromSudoku="getCurBoardFromSudoku"
+        @eventCurrentBoardFromSudoku="getCurBoardFromBoard"
         @eventSudokuResult="handleResultEvent"
         :boardDataLoadedToBoard="boardDataLoadedToBoard"
     />
@@ -105,9 +105,6 @@ export default {
       boardDataLoadedToBoard: null,
     };
   },
-  watch: {
-
-  },
   mounted() {
     this.taskid = -1;
     this.ws = null;
@@ -119,11 +116,8 @@ export default {
   },
   methods: {
     handleResultEvent(result) {
-      //{total: 15, empty: 14, error: 0, success: false}
       this.result = result;
-      // console.log(result);
     },
-    // moment,
     // TODO: modify the name
     handleChange(e) {
       console.log(`checked = ${e.target.value}`);
@@ -170,7 +164,7 @@ export default {
 
       if (this.ws != null) {
         this.$axios.post('/stop/', {
-          taskId: this.taskid,
+          solverId: this.taskid,
         }).then(res =>
         {
           console.log('stop success!');
@@ -183,6 +177,44 @@ export default {
       }
       this.ws = null;
       this.taskid = -1;
+    },
+    handleContinue() {
+      if (this.start) {
+        this.stopped = false;
+        if (this.taskid !== -1) {
+          this.$axios.get('/state/'+this.taskid)
+              .then(res => {
+                console.log(res.data);
+                let str = res.data;
+                let url = '';
+                if (str === 'NEW') url = '/start/';
+                else if (str === 'SUSPEND') url = '/resume/';
+
+                this.$axios.post(url, {
+                  solverId: this.taskid,
+                }).then(res => {
+                  console.log('task ' + this.taskid + ' ' + url + ' resume success')
+                }).catch(err => {
+                  console.log(err);
+                })
+              })
+              .catch(err => {
+                console.log(err);
+              })
+        }
+      }
+    },
+    handleStop() {
+      if (this.solver) {
+        this.$axios.post('/suspend/', {
+          solverId: this.taskid,
+        }).then(res => {
+          console.log('task ' + this.taskid + ' suspend success!');
+        }).catch(err => {
+          console.log(err);
+        });
+      }
+      this.stopped = true;
     },
     handleLoad() {
       this.$refs.refFile.dispatchEvent(new MouseEvent('click'))
@@ -208,48 +240,10 @@ export default {
         var url = window.URL.createObjectURL(blob);
         var filename = new Date().getTime().toString();
         a.href = url;
-        a.download = filename;
+        a.download = 'sdk' + filename;
         a.click();
         window.URL.revokeObjectURL(url);
       })
-    },
-    handleContinue() {
-      if (this.start) {
-        this.stopped = false;
-        if (this.taskid !== -1) {
-          this.$axios.get('/state/'+this.taskid)
-              .then(res => {
-                console.log(res.data);
-                let str = res.data;
-                let url = '';
-                if (str === 'NEW') url = '/start/';
-                else if (str === 'SUSPEND') url = '/resume/';
-
-                this.$axios.post(url, {
-                  taskId: this.taskid,
-                }).then(res => {
-                  console.log('task ' + this.taskid + ' ' + url + ' resume success')
-                }).catch(err => {
-                  console.log(err);
-                })
-              })
-              .catch(err => {
-                console.log(err);
-              })
-        }
-      }
-    },
-    handleStop() {
-      if (this.solver) {
-        this.$axios.post('/suspend/', {
-          taskId: this.taskid,
-        }).then(res => {
-          console.log('task ' + this.taskid + ' suspend success!');
-        }).catch(err => {
-          console.log(err);
-        });
-      }
-      this.stopped = true;
     },
     handleDownload() {
       let that = this;
@@ -267,7 +261,7 @@ export default {
         let blob = new Blob([data], {type: 'application/json'});
         var a = document.createElement('a');
         var url = window.URL.createObjectURL(blob);
-        var filename = 'Ori' + new Date().getTime().toString();
+        var filename = 'Orisdk' + new Date().getTime().toString();
         a.href = url;
         a.download = filename;
         a.click();
@@ -281,11 +275,8 @@ export default {
       console.log('getCurBoard end', this.boardDataFromBoard);
       return this.boardDataFromBoard;
     },
-    setCurBoard(data) {
-      this.boardDataToBoard = data;
-    },
-    getCurBoardFromSudoku(BoardData) {
-      console.log('trigger getCurBoardFromSudoku')
+    getCurBoardFromBoard(BoardData) {
+      console.log('trigger getCurBoardFromBoard in sudoku')
       this.boardDataFromBoard = BoardData;
     },
     webSocketInit() {
@@ -293,7 +284,7 @@ export default {
     },
     startTask() {
       this.$axios.post('/start/', {
-        taskId: this.taskid,
+        solverId: this.taskid,
       }).then(res => {
         console.log('start task', res);
         console.log('task ' + this.taskid + ' start success');
@@ -329,13 +320,21 @@ export default {
     },
     createTask() {
       let boarddata = this.boardDataFromBoard['board'];
+      let disable = this.boardDataFromBoard['disable'];
+      for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+          if (disable[i][j] === 0) {
+            boarddata[i][j] = 0;
+          }
+        }
+      }
 
       this.$axios.post('/sdk/create/', {
         board: boarddata,
       }).then(res => {
         console.log('create res', res);
 
-        this.taskid = res.data['taskId'];
+        this.taskid = res.data['solverId'];
         console.log('create task ' + this.taskid + ' success!');
 
         this.webSocketInit();

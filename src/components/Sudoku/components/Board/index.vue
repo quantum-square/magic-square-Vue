@@ -81,7 +81,7 @@ export default {
   },
   watch: {
     start(val) {
-      if (val == true) {
+      if (val === true) {
         this.initGrid();
         this.sendResult();
       } else {
@@ -125,18 +125,19 @@ export default {
             disable[i][j] = this.cells[i*this.row+j].disable ? 1 : 0;
           }
         }
+        this.makeCellsUnselected();
         let obj = {'board':BoardData, 'disable':disable};
         this.$emit(EVENT.CURRENT_BOARD_FROM_Board, obj);
       }
     },
-    // TODO:有点问题问题在哪我不知道嘻嘻（load之后开solver最后timer行为不正常）
+    // TODO: 可能有问题
     boardDataLoadedToBoard: {
       handler: function () {
         console.log('Board know what to load', this.boardDataLoadedToBoard);
         for (let i = 0; i < 9; i++) {
           for (let j = 0; j < 9; j++) {
             this.cells[i*9+j]['disable'] = this.boardDataLoadedToBoard['disable'][i][j] === 1;
-            this.cells[i*9+j]['number'] = this.boardDataLoadedToBoard['board'][i][j];
+            this.cells[i*9+j]['number'] = this.boardDataLoadedToBoard['board'][i][j] === 0 ? null : this.boardDataLoadedToBoard['board'][i][j];
           }
         }
         console.log(this.cells)
@@ -386,6 +387,12 @@ export default {
       let {x, y} = cell;
       this.showCellSelect(x, y);
       this.$emit(EVENT.CELL_CLICK, cell);
+    },
+    makeCellsUnselected() {
+      for (let index = 0; index < this.cells.length; index++) {
+        let cell = this.cells[index];
+        cell.selected = false;
+      }
     }
   }
 };

@@ -95,9 +95,12 @@ export default {
   },
   watch: {
     start(val) {
-      if (val == true) {
+      if (val === true) {
         this.boardModel.level = this.config.level;
       }
+      // else {
+      // genxinresult
+      // }
     }
   },
   beforeCreate() {
@@ -106,9 +109,7 @@ export default {
   },
   methods: {
     handleResultEvent(result) {
-      //{total: 15, empty: 14, error: 0, success: false}
       this.result = result;
-      // console.log(result);
       this.$emit(EVENT.SUDOKU_RESULT, this.result);
     },
     handleCellClickEvent(cell) {
