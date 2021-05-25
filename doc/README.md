@@ -89,13 +89,13 @@ src
 ![](./img/magic_square.png)
 
 ### Magic Rule
-![](./img/magic_rule.png)
+![](./img/Magic_Rule.png)
 
 ### Sudoku
-![](./img/sudoku.png)
+![](./img/Sudoku.png)
 
 ### Sudoku Rule
-![](./img/sudoku_rule.png)
+![](./img/Sudoku_Rule.png)
 
 ## Acknowledgement
 Thanks to [17881055/vue-sudoku](https://github.com/17881055/vue-sudoku). Our work is based on this repository.
