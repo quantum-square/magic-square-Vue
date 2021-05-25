@@ -54,7 +54,8 @@ export default {
       boardModel: {
         selectCell: null,
         selectBarNumber: null,
-        level: 1
+        level: 1,
+        disable: false
       },
       selectBarModel: {
         able: false
