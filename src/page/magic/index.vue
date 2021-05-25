@@ -255,7 +255,7 @@ export default {
         try {
           let data = this.result;
           data = JSON.parse(data);
-          if (data['board'].length() === that.dimension && data['board'][0].length() === that.dimension) {
+          if (data['board'].length === that.dimension.value && data['board'][0].length === that.dimension.value) {
             that.boardDataLoadedToBoard = data;
           }
           else {
