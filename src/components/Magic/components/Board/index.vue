@@ -139,6 +139,7 @@ export default {
             disable[i][j] = this.cells[(i+1)*(this.dimension+2)+j+1].disable ? 1 : 0;
           }
         }
+        this.makeCellsUnselected();
         let obj = {'board':BoardData, 'disable':disable};
         this.$emit(EVENT.CURRENT_BOARD_FROM_Board, obj);
       }
@@ -146,6 +147,7 @@ export default {
     boardDataLoadedToBoard: {
       handler: function () {
         console.log('Board know what to load', this.boardDataLoadedToBoard);
+        this.makeCellsUnselected();
         for (let i = 0; i < 9; i++) {
           for (let j = 0; j < 9; j++) {
             this.cells[(i+1)*(this.dimension+2)+j+1]['disable'] = this.boardDataLoadedToBoard['disable'][i][j] === 1;
@@ -264,6 +266,7 @@ export default {
     // 更新所有cells
     updateAllCells() {
       console.log("updateAllCells", this.boardData);
+      this.makeCellsUnselected();
       if (this.boardData.length === this.dimension
           && this.boardData[0].length === this.dimension) {
         for (let index = this.dimension+1; index < (this.dimension+1)*(this.dimension+2); index++) {

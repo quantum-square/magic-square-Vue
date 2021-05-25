@@ -74,6 +74,7 @@
 
 <script>
 import Magic from "../../components/Magic";
+import {message} from "ant-design-vue";
 
 function validateDimensionNumber(number) {
   if (0 <= number && number <= 40) {
@@ -253,9 +254,19 @@ export default {
       const reader = new FileReader();
       reader.readAsText(selectedFile);
       reader.onload = function() {
-        let data = this.result;
-        that.boardDataLoadedToBoard = JSON.parse(data);
-
+        try {
+          let data = this.result;
+          data = JSON.parse(data);
+          if (data['board'].length() === that.dimension && data['board'][0].length() === that.dimension) {
+            that.boardDataLoadedToBoard = data;
+          }
+          else {
+            message.warning('Wrong Format');
+          }
+        }
+        catch (e) {
+          message.error(e);
+        }
       }
     },
     handleSave() {

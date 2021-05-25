@@ -134,6 +134,7 @@ export default {
     boardDataLoadedToBoard: {
       handler: function () {
         console.log('Board know what to load', this.boardDataLoadedToBoard);
+        this.makeCellsUnselected();
         for (let i = 0; i < 9; i++) {
           for (let j = 0; j < 9; j++) {
             this.cells[i*9+j]['disable'] = this.boardDataLoadedToBoard['disable'][i][j] === 1;
@@ -336,6 +337,7 @@ export default {
     // 更新所有cells
     updateAllCells() {
       console.log("updateAllCells", this.boardData);
+      this.makeCellsUnselected();
       if (this.boardData.length === this.col
           && this.boardData[0].length === this.row) {
         for (let index = 0; index < this.cells.length; index++) {
