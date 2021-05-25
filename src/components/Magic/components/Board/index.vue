@@ -227,11 +227,7 @@ export default {
           let num = this.cells[(i+1)*(this.dimension+2)+j+1].number !== null ? this.cells[(i+1)*(this.dimension+2)+j+1].number : 0;
           sum += num;
         }
-        if (sum !== magicSum)
-        {
-          console.log(i, sum);
-          result = false;
-        }
+        if (sum !== magicSum) result = false;
         this.cells[(i+1)*(this.dimension+2)]['number'] = sum;
         this.cells[(i+2)*(this.dimension+2)-1]['number'] = sum;
       }
@@ -275,7 +271,6 @@ export default {
       if (this.boardData.length === this.dimension
           && this.boardData[0].length === this.dimension) {
         for (let index = this.dimension+1; index < (this.dimension+1)*(this.dimension+2); index++) {
-          console.log('hhh')
           let cell = this.cells[index];
           cell.number = (!cell.disable && this.boardData[Math.floor(index/(this.dimension+2))-1][index%(this.dimension+2) - 1]!==0) ? this.boardData[Math.floor(index/(this.dimension+2))-1][index%(this.dimension+2) - 1] : cell.number;
         }
