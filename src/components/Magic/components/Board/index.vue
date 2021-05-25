@@ -84,7 +84,7 @@ export default {
   data() {
     return {
       cells: [],
-      board_size: 600
+      board_size: 800
     };
   },
 
@@ -102,9 +102,9 @@ export default {
     },
     dimension(val) {
       if (1 <= val && val <= 20) {
-        this.board_size = 600;
+        this.board_size = 800;
       } else if (val > 20 && val <= 40) {
-        this.board_size = 1500;
+        this.board_size = 2000;
       }
     },
     model: {

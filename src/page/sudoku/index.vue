@@ -25,7 +25,7 @@
           </a-radio-group>
         </a-col>
         <a-col :span="5">
-          <span>Solver </span>
+          <span><b>Solver </b></span>
           <a-switch :defaultChecked="solver" @change="onChangeSolver"/>
         </a-col>
       </a-row>

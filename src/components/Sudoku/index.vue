@@ -2,7 +2,7 @@
   <div class="main">
     <Timer :start="start" :stopped="stopped" :result="result" class="timer"/>
     <Info :start="start" :result="result" class="info"/>
-    <a-divider/>
+    <a-divider class="line-sudoku"></a-divider>
     <Board
         class="board"
         :start="start"
@@ -169,5 +169,8 @@ export default {
   width: 100px;
 
   //  background: #e6e6e6;
+}
+.line-sudoku{
+  top: .6em;
 }
 </style>

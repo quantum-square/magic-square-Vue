@@ -2,8 +2,8 @@
   <div class="info" v-if="result && start">
     <span v-if="0 !== result.empty">{{ result.empty }}/{{ result.total }}</span>
     <template v-if="0 === result.empty">
-      <span v-if="result.success">恭喜通关</span>
-      <span v-if="result.error">有错误</span>
+      <span v-if="result.success"><b>Congratulations</b></span>
+      <span v-if="result.error"><b>Wrong</b></span>
     </template>
   </div>
   <div class="info" v-else>

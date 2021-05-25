@@ -1,8 +1,8 @@
 <template>
   <div id="together" class="wrap">
     <div class="mean">
-      <a-row>
-        <a-col :span="5">
+      <a-row class="row-magic">
+        <a-col :span="6">
           <a-button type="primary" :disabled="start" size="small" @click="handleStartClick">
             Start
           </a-button>
@@ -11,20 +11,13 @@
           </a-button>
         </a-col>
 
-        <a-col :span="5">
-          <a-radio-group size="small" buttonStyle="solid" v-model="config.level" :disabled="start" @change="handleChange">
-            <a-radio-button value="1">Easy</a-radio-button>
-            <a-radio-button value="2">Normal</a-radio-button>
-            <a-radio-button value="3">Hard</a-radio-button>
-          </a-radio-group>
-        </a-col>
-        <a-col :span="5">
-          <span>Dimension </span>
+        <a-col :span="8">
+          <span><b>Dimension </b></span>
           <a-input-number :disabled="start" :default-value="dimension.value" size="small" :min="1" :max="40"
                           @change="handleDimensionChange"/>
         </a-col>
         <a-col :span="5">
-          <span>Solver </span>
+          <span><b>Solver </b></span>
           <a-switch :defaultChecked="solver" @change="onChangeSolver"/>
         </a-col>
       </a-row>
@@ -391,7 +384,9 @@ export default {
 <style lang="scss" scoped>
 #together {
 }
-
+.row-magic{
+  margin-left: 250px;
+}
 
 .mean {
   padding: 20px;
@@ -410,7 +405,7 @@ export default {
 
 .buttonsBar {
   margin-left: 0px;
-  margin-top: 100px;
+  margin-top: 150px;
   width: 100px;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="timer">
+  <div className="timer">
     <div ref="startTimer"></div>
   </div>
 </template>
@@ -40,30 +40,30 @@ export default {
     result: {
       handler: function (newValue) {
         console.log("handler", newValue);
-        // if (newValue.success) this.pause();
-        // else if (this.stopped) this.pause();
-        // else this.action();
-        this.switchState();
+        if (newValue.success) this.pause();
+        else if (this.stopped) this.pause();
+        else this.action();
+        // this.switchState();
       },
       deep: true
     },
     start(val) {
       console.log("start", val);
-      this.switchState();
-      // if (val === true) {
-      //   this.action();
-      // } else {
-      //   this.reset();
-      // }
+      // this.switchState();
+      if (val === true) {
+        this.action();
+      } else {
+        this.reset();
+      }
     },
     stopped(val) {
       console.log("stopped", val);
-      // if (val === true) {
-      //   this.pause();
-      // } else {
-      //   this.action();
-      // }
-      this.switchState();
+      if (val === true) {
+        this.pause();
+      } else {
+        this.action();
+      }
+      // this.switchState();
     }
   },
   created() {
@@ -75,16 +75,13 @@ export default {
     switchState() {
       if (!this.start) {
         this.reset();
-      }
-      else {
+      } else {
         if (this.stopped) {
           this.pause();
-        }
-        else {
+        } else {
           if (this.result.success) {
             this.pause();
-          }
-          else {
+          } else {
             this.action();
           }
         }
@@ -144,7 +141,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.timer{
+.timer {
   padding-left: 40px;
 }
 </style>

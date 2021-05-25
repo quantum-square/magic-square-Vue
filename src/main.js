@@ -14,7 +14,15 @@ axios.defaults.baseURL = '/api'
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 Vue.config.productionTip = false
 
+router.beforeEach((to, from, next) => {
+    if (to.meta.title) {
+        document.title = to.meta.title;
+    }
+    next()
+})
+
+
 new Vue({
-  render: h => h(App),
-  router
+    render: h => h(App),
+    router
 }).$mount('#app')

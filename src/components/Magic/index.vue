@@ -4,11 +4,11 @@
       <a-col :span="5">
         <Timer :start="start" :stopped="stopped" :result="result" class="timer"/>
       </a-col>
-      <a-col :span="10">
+      <a-col :span="13">
         <Info :start="start" :result="result" class="info"/>
       </a-col>
       <a-col :span="3">
-        <div class="info">
+        <div class="info-select">
           <span>Select:</span>
         </div>
       </a-col>
@@ -174,18 +174,22 @@ export default {
   height: 800px;
 }
 
-.info {
+.info-select {
   //position: absolute;
-  left: 0px;
-  top: 0px;
+  padding-left: 80px;
+  left: 0;
+  top: 0;
   font-size: 18px;
   font-weight: bold;
   color: #228cbd;
 }
+.selectBar{
+  margin-left: 80px;
+}
 
 .timer {
   position: relative;
-  left: 0;
+  left: 80px;
   top: 0;
 
   font-size: 18px;
@@ -201,20 +205,20 @@ export default {
 .board {
   position: absolute;
 
-  left: 100px;
-  top: 30px;
-  width: 600px;
-  height: 600px;
+  left: 200px;
+  top: 50px;
+  width: 800px;
+  height: 800px;
   -webkit-transform: scale(0.875);
   background: #e6e6e6;
 }
 
 .big-board {
   position: relative;
-  left: -350px;
-  top: -500px;
-  width: 1500px;
-  height: 1500px;
+  left: -400px;
+  top: -630px;
+  width: 2000px;
+  height: 2000px;
   background: #e6e6e6;
   -webkit-transform: scale(0.35);
 
