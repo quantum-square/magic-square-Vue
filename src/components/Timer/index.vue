@@ -91,12 +91,14 @@ export default {
       }
     },
     action() {
+      console.log('action');
       if (this.timer) {
         return;
       }
       this.timer = setInterval(this.startTimer, 10);
     },
     pause() {
+      console.log('pause');
       clearInterval(this.timer);
       this.timer = null;
     },

@@ -7,10 +7,7 @@
       :style="{height: scrollerSize, width: scrollerSize, lineHeight: scrollerSize, fontsize:scrollerFontSize}"
       :class="[{able:control.disable,hover:control.hover && !control.selected,selected:control.selected}]"
   >
-    <template v-if="control.number">{{ control.number }}</template>
-    <!-- <template v-else>
-      <p class="font-12">{{control&&control.x}}{{control&&control.y}},{{control&&control.box}}</p>
-    </template>-->
+    <template v-if="control.number>=0">{{ control.number }}</template>
   </div>
 </template>
 
@@ -27,7 +24,6 @@ export default {
           hover: false,
           selected: false,
           disable: false,
-          box: null,
           x: "-",
           y: "-"
         };
@@ -56,17 +52,17 @@ export default {
   },
   methods: {
     handleClick() {
-      if (this.control.disable) return;
+      // if (this.control.disable) return;
       this.$emit(EVENT.CELL_CLICK, this.control);
       // console.log(EVENT.CELL_CLICK, this.title, this.position);
     },
     handleMouseOver() {
-      if (this.control.disable) return;
+      // if (this.control.disable) return;
       this.$emit(EVENT.CELL_MOUSE_OVER, this.control);
       //console.log(EVENT.CELL_MOUSE_OVER, this.title, this.position);
     },
     handleMouseOut() {
-      if (this.control.disable) return;
+      // if (this.control.disable) return;
       this.$emit(EVENT.CELL_MOUSE_OUT);
       // console.log(EVENT.CELL_MOUSE_OUT);
     }

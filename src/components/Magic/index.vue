@@ -13,7 +13,7 @@
         </div>
       </a-col>
       <a-col :span="2">
-        <a-input-number class="selectBar" :disabled="!(start&&!stopped&&!solver)" :min="0"
+        <a-input-number class="selectBar" :disabled="!(start&&!solver)" :min="0"
                         :max="dimension*dimension"
                         @change="handleNumberChange"/>
       </a-col>
@@ -29,7 +29,11 @@
         :model="boardModel"
         :dimension="dimension"
         @eventCellClick="handleCellClickEvent"
-        @eventSudokuResult="handleResultEvent"/>
+        @eventSudokuResult="handleResultEvent"
+        :boardData="boardData"
+        :indicationToGetCurBoard="indicationToGetCurBoard"
+        @eventCurrentBoardFromBoard="getCurBoardFromBoard"
+        :boardDataLoadedToBoard="boardDataLoadedToBoard"/>
 
   </div>
 </template>
@@ -38,6 +42,7 @@
 import Info from "../Info";
 import Timer from "../Timer";
 import Board from "./components/Board";
+import EVENT from "../event";
 
 
 export default {
@@ -53,7 +58,8 @@ export default {
       boardModel: {
         selectCell: null,
         selectBarNumber: null,
-        level:1
+        level:1,
+        disable:false
       },
       selectBarModel: {
         able: false
@@ -94,6 +100,17 @@ export default {
       type: Number,
       default: 9,
       required: false
+    },
+    boardData: {
+      type: Array,
+      required: false,
+    },
+    indicationToGetCurBoard: {
+      type: Boolean
+    },
+    boardDataLoadedToBoard: {
+      type:Object,
+      default: null
     }
   },
   watch: {
@@ -118,9 +135,8 @@ export default {
   },
   methods: {
     handleResultEvent(result) {
-      //{total: 15, empty: 14, error: 0, success: false}
       this.result = result;
-      // console.log(result);
+      this.$emit(EVENT.SUDOKU_RESULT, this.result);
     },
     handleCellClickEvent(cell) {
       this.boardModel.selectCell = cell;
@@ -130,11 +146,17 @@ export default {
       this.boardModel.selectBarNumber = number;
     },
     handleNumberChange(value) {
-      if (value == "" || 1 <= value && value <= this.dimension * this.dimension) {
+      // TODO
+      if (value === "" || 1 <= value && value <= this.dimension * this.dimension) {
         this.number = value;
       }
       this.boardModel.selectBarNumber = this.number;
-    }
+      this.boardModel.disable = this.stopped;
+    },
+    getCurBoardFromBoard(BoardData) {
+      console.log('trigger getCurBoardFromBoard in Magic')
+      this.$emit(EVENT.CURRENT_BOARD_FROM_Magic, BoardData);
+    },
   }
 };
 </script>
