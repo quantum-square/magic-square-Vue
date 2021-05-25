@@ -1,15 +1,16 @@
 <template>
   <div class="board" v-if="dimension<=40">
-    <template v-for="(item, i) in dimension">
+    <template v-for="(item, i) in dimension+2">
       <div class="row" :key="i">
-        <template v-for="(item, j) in dimension">
+        <template v-for="(item, j) in dimension+2">
           <Cell
               :control="getCellControl(i,j)"
-              :size=(board_size/dimension)
+              :size=(board_size/(dimension+2))
               @eventCellClick="handleCellClickEvent"
-              @eventMouseOver="handlCellMouseEvent"
-              @eventMouseOut="handlCellMouseEvent"
+              @eventMouseOver="handleCellMouseEvent"
+              @eventMouseOut="handleCellMouseEvent"
               :key="`${i}-${j}`"
+              :indicationConstraint="indicationConstraint"
           />
         </template>
       </div>
@@ -47,7 +48,8 @@ export default {
         return {
           level: 1,
           selectCell: null,
-          selectBarNumber: null
+          selectBarNumber: null,
+          disable:null
         };
       },
       required: true
@@ -61,6 +63,21 @@ export default {
       type: Boolean,
       default: true,
       required: false
+    },
+    boardData: {
+      type: Array,
+      required: false,
+    },
+    indicationToGetCurBoard: {
+      type: Boolean
+    },
+    boardDataLoadedToBoard: {
+      type: Object,
+      default: null,
+    },
+    indicationConstraint: {
+      typr: Boolean,
+      default: true,
     }
   },
 
@@ -78,10 +95,8 @@ export default {
       if (val === true) {
         this.initGrid();
         this.sendResult();
-        if (this.solver) {
-          this.gameSolver();
-        }
-      } else {
+      }
+      else {
         this.gameOver();
       }
     },
@@ -94,7 +109,7 @@ export default {
     },
     model: {
       handler: function () {
-        this.cellwriteNumber();
+        this.cellWriteNumber();
         this.sendResult();
       },
       deep: true
@@ -104,14 +119,57 @@ export default {
         // console.log(newValue);
       },
       deep: true
+    },
+    boardData: {
+      handler: function () {
+        console.log('Board know the change', this.boardData);
+        if (this.start && this.solver && !this.stopped) {
+          this.updateAllCells();
+        }
+        console.log('Update success');
+      },
+      deep: true
+    },
+    indicationToGetCurBoard: {
+      handler: function () {
+        console.log('want to get current board in Board');
+
+        let BoardData = [];
+        let disable = [];
+        for (let i = 0; i < this.dimension; i++) {
+          BoardData[i] = [];
+          disable[i] = [];
+          for (let j = 0; j < this.dimension; j++) {
+            BoardData[i][j] = this.cells[(i+1)*(this.dimension+2)+j+1].number == null ? 0 : this.cells[(i+1)*(this.dimension+2)+j+1].number;
+            disable[i][j] = this.cells[(i+1)*(this.dimension+2)+j+1].disable ? 1 : 0;
+          }
+        }
+        this.makeCellsUnselected();
+        let obj = {'board':BoardData, 'disable':disable};
+        this.$emit(EVENT.CURRENT_BOARD_FROM_Board, obj);
+      }
+    },
+    boardDataLoadedToBoard: {
+      handler: function () {
+        console.log('Board know what to load', this.boardDataLoadedToBoard);
+        this.makeCellsUnselected();
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 9; j++) {
+            this.cells[(i+1)*(this.dimension+2)+j+1]['disable'] = this.boardDataLoadedToBoard['disable'][i][j] === 1;
+            this.cells[(i+1)*(this.dimension+2)+j+1]['number'] = this.boardDataLoadedToBoard['board'][i][j] === 0 ? null : this.boardDataLoadedToBoard['board'][i][j];
+          }
+        }
+        console.log(this.cells)
+        this.sendResult();
+      }
     }
   },
   methods: {
     //初始化Grid
     initGrid() {
       this.cells = [];
-      for (let i = 0; i < this.dimension; i++) {
-        for (let j = 0; j < this.dimension; j++) {
+      for (let i = 0; i < this.dimension+2; i++) {
+        for (let j = 0; j < this.dimension+2; j++) {
           let cell = {
             number: null,
             hover: false,
@@ -120,36 +178,34 @@ export default {
             x: i,
             y: j
           };
+          if (i === 0 || i === this.dimension+1 || j === 0 || j === this.dimension+1)
+          {
+            cell.number = 0;
+            cell.disable = true;
+          }
           this.cells.push(cell);
         }
       }
 
-      // let a = new Date();
-      // console.log("start");
-      this.generateGame(this.model.level);
-      // console.log("end", new Date() - a);
+      this.updateMagicSum();
     },
     sendResult() {
-      let result = true;
+      let success = false;
       if (this.getDefectCell() === 0) {
-        result = this.cells.some(cell => {
-          return !this.check(cell, cell.number);
-        });
+         success = this.updateMagicSum();
       }
-      // console.log(!result);
-      this.$emit(EVENT.SUDOKU_RESULT, {
-        total: this.model.level * 15,
-        empty: this.getDefectCell(),
-        error: result,
-        success: !result
-      });
-    },
-    gameSolver() {
 
+      // TODO: total is wrong
+      this.$emit(EVENT.SUDOKU_RESULT, {
+        total: this.dimension*this.dimension,
+        empty: this.getDefectCell(),
+        error: !success,
+        success: success
+      });
     },
     gameOver() {
       this.cells = [];
-      for (let i = 0; i < this.dimension * this.dimension; i++) {
+      for (let i = 0; i < (this.dimension+2) * (this.dimension+2); i++) {
         let cell = {
           number: null,
           hover: false,
@@ -163,113 +219,67 @@ export default {
 
       console.log("gameOver", this.cells);
     },
-
-    //检查是否有重复数；
-    check(targetCell, num) {
-      let {cells} = this;
-
-      for (let index = 0; index < cells.length; index++) {
-        let cell = cells[index];
-
-        if (
-            targetCell == cell ||
-            (targetCell.x === cell.x && targetCell.y === cell.y)
-        )
-          continue;
-        // 判断行;
-        // 判断列;
-        // 判断宫;
-        if (
-            targetCell.x === cell.x ||
-            targetCell.y === cell.y
-        ) {
-          //   console.log(num, cell.number);
-          if (num === cell.number) {
-            return false;
-          }
+    updateMagicSum() {
+      let result = true, sum = 0, magicSum = (1+this.dimension*this.dimension) * this.dimension / 2;
+      for (let i = 0; i < this.dimension; i++) {
+        sum = 0;
+        for (let j = 0; j < this.dimension; j++) {
+          let num = this.cells[(i+1)*(this.dimension+2)+j+1].number !== null ? this.cells[(i+1)*(this.dimension+2)+j+1].number : 0;
+          sum += num;
         }
+        if (sum !== magicSum)
+        {
+          console.log(i, sum);
+          result = false;
+        }
+        this.cells[(i+1)*(this.dimension+2)]['number'] = sum;
+        this.cells[(i+2)*(this.dimension+2)-1]['number'] = sum;
       }
-      return true;
-    },
 
-    //生成随机号码串
-    randomNumbers(arr = [], length = 1) {
-      var result = [];
-      for (var i = 0; i < length; i++) {
-        var ran = Math.floor(Math.random() * (arr.length - i));
-        result.push(arr[ran]);
-        arr[ran] = arr[arr.length - i - 1];
+      for (let i = 0; i < this.dimension; i++) {
+        sum = 0;
+        for (let j = 0; j < this.dimension; j++) {
+          let num = this.cells[(j+1)*(this.dimension+2)+i+1].number !== null ? this.cells[(j+1)*(this.dimension+2)+i+1].number : 0;
+          sum += num;
+        }
+        if (sum !== magicSum) result = false;
+        this.cells[i+1]['number'] = sum;
+        this.cells[(this.dimension+1)*(this.dimension+2)+(i+1)]['number'] = sum;
       }
+
+      sum = 0;
+      for (let i = 0; i < this.dimension; i++) {
+        let num = this.cells[(i+1)*(this.dimension+2)+i+1].number !== null ? this.cells[(i+1)*(this.dimension+2)+i+1].number : 0;
+        sum += num;
+      }
+      if (sum !== magicSum) result = false;
+      this.cells[0]['number'] = sum;
+      this.cells[(this.dimension+2)*(this.dimension+2)-1]['number'] = sum;
+
+      sum = 0;
+      for (let i = 0; i < this.dimension; i++) {
+        let num = this.cells[(i+2)*(this.dimension+1)].number !== null ? this.cells[(i+2)*(this.dimension+1)].number : 0;
+        sum += num;
+      }
+      if (sum !== magicSum) result = false;
+      this.cells[(this.dimension+1)]['number'] = sum;
+      this.cells[(this.dimension+1)*(this.dimension+2)]['number'] = sum;
+
+
       return result;
     },
-
-    //按等级生成随机数字
-    generateGame(level = 1) {
-      let t = 0;
-      // let numArr = [];
-      let rn = level * Math.round(this.dimension * this.dimension / 6); //Level 1 隐藏 15个 ；Level 2 隐藏 30个 ；Level 3 隐藏 45个
-      //let rn = 3; //Level 1 隐藏 15个 ；Level 2 隐藏 30个 ；Level 3 隐藏 45个
-      let rArr = this.randomNumbers(Array.from(new Array(this.dimension * this.dimension).keys()), rn);
-      // console.log(level);
-
-      // let upset = true;
-      let {cells} = this;
-      let oi = null;
-      for (let i = 0; i < cells.length; i++) {
-        //console.log(i);
-
-        const cell = cells[i];
-        let orderAarr = [];
-        for (let j = 0; j < this.dimension; j++) {
-          orderAarr[j] = j + 1;
+    // 更新所有cells
+    updateAllCells() {
+      console.log("updateAllCells", this.boardData);
+      this.makeCellsUnselected();
+      if (this.boardData.length === this.dimension
+          && this.boardData[0].length === this.dimension) {
+        for (let index = this.dimension+1; index < (this.dimension+1)*(this.dimension+2); index++) {
+          console.log('hhh')
+          let cell = this.cells[index];
+          cell.number = (!cell.disable && this.boardData[Math.floor(index/(this.dimension+2))-1][index%(this.dimension+2) - 1]!==0) ? this.boardData[Math.floor(index/(this.dimension+2))-1][index%(this.dimension+2) - 1] : cell.number;
         }
-        let nums = this.randomNumbers(orderAarr, this.dimension);
-        //获取一个随机数并判断这个随机数是否符合要求
-        for (let j = 0; j < nums.length; j++) {
-          const num = nums[j];
-          // 判断行，
-          // 判断列，
-          // 判断宫，
-          cell.number = num;
-          cell.disable = true;
-          break;
-          // if (this.check(cell, num)) {
-          //   cell.number = num;
-          //   cell.disable = true;
-          //   break;
-          // } else if (j === nums.length - 1) {
-          //   //判断格式尝试数量达到 9 次后重新洗牌再算；
-          //   const RESET_TIME = this.dimension;
-          //   if (oi === i) {
-          //     t++;
-          //   } else {
-          //     oi = i;
-          //     t = 0;
-          //   }
-          //   i = 0;
-          //   //重新洗牌
-          //   if (t % RESET_TIME == 0 && t != 0) {
-          //     i = -1;
-          //     j = 0;
-          //     for (let index = 0; index < cells.length; index++) {
-          //       let cell = cells[index];
-          //       cell.number = null;
-          //     }
-          //     //给一个固定值防止死循环
-          //   } else if (t >= 550) {
-          //     return;
-          //   }
-          //   // console.log(t);
-          //   break;
-          // }
-        }
-      }
-
-      for (let index = 0; index < rArr.length; index++) {
-        let hideNum = rArr[index];
-        const cell = cells[hideNum];
-        cell.number = null;
-        cell.disable = false;
+        this.sendResult();
       }
     },
     getCellControl(x, y) {
@@ -278,21 +288,36 @@ export default {
       });
     },
     //写入选中号码
-    cellwriteNumber() {
+    cellWriteNumber() {
       let {cells, model} = this;
       for (let index = 0; index < cells.length; index++) {
         let cell = cells[index];
         let number =
-            model.selectBarNumber === "clear" ? null : model.selectBarNumber;
-        cell.number = cell.selected ? number : cell.number;
+            model.selectBarNumber > 0 ? model.selectBarNumber : null;
+        if (this.stopped) {
+          if (!this.indicationConstraint) {
+            if (cell.x !== 0 && cell.x !== this.dimension + 1 && cell.y !== 0 && cell.y !== this.dimension + 1) {
+              cell.number = cell.selected ? number : cell.number;
+              if (cell.selected) {
+                if (number)
+                  cell.disable = true;
+                else
+                  cell.disable = false;
+              }
+            }
+          }
+        }
+        else {
+          if (!cell.disable) cell.number = cell.selected ? number : cell.number;
+        }
       }
+      this.updateMagicSum();
     },
-
     showCellSelect(x, y) {
       let {cells} = this;
       for (let index = 0; index < cells.length; index++) {
         let cell = cells[index];
-        cell.selected = cell.x == x && cell.y == y ? true : false;
+        cell.selected = cell.x === x && cell.y === y;
       }
     },
     //显示鼠标经过的方格的当前列和当前行
@@ -300,20 +325,22 @@ export default {
       let {cells} = this;
       for (let index = 0; index < cells.length; index++) {
         let cell = cells[index];
-        cell.hover = cell.x == x || cell.y == y ? true : false;
+        cell.hover = cell.x === x || cell.y === y;
       }
     },
     getDefectCell() {
-      let {cells} = this;
-      return cells.reduce((prev, cell) => {
-        if (!cell.number) {
-          return ++prev;
+      let count = 0;
+      for (let i  = 0; i < this.dimension; i++) {
+        for (let j = 0; j < this.dimension; j++) {
+          if (!this.cells[(i+1)*(this.dimension+2)+j+1]['number']) {
+            count++;
+          }
         }
-        return prev;
-      }, 0);
+      }
+      return count;
     },
-    handlCellMouseEvent(cell) {
-      if (!this.start || this.stopped || this.solver) return;
+    handleCellMouseEvent(cell) {
+      if (!this.start || this.solver) return;
       if (cell) {
         if (this.showMouseHover) {
           let {x, y} = cell;
@@ -324,10 +351,17 @@ export default {
       }
     },
     handleCellClickEvent(cell) {
-      if (!this.start || this.stopped || this.solver) return;
+      if (!this.start || this.solver) return;
       let {x, y} = cell;
+      console.log(x,y);
       this.showCellSelect(x, y);
       this.$emit(EVENT.CELL_CLICK, cell);
+    },
+    makeCellsUnselected() {
+      for (let index = 0; index < this.cells.length; index++) {
+        let cell = this.cells[index];
+        cell.selected = false;
+      }
     }
   }
 };

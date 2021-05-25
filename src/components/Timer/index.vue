@@ -32,20 +32,18 @@ export default {
     },
     stopped: {
       type: Boolean,
-      default: false,
+      default: true,
       required: true
     }
   },
   watch: {
     result: {
       handler: function (newValue) {
-        if (newValue.success) {
-          //暂停
-          this.pause();
-        } else {
-          //开始
-          this.action();
-        }
+        console.log("handler", newValue);
+        // if (newValue.success) this.pause();
+        // else if (this.stopped) this.pause();
+        // else this.action();
+        this.switchState();
       },
       deep: true
     },
@@ -73,15 +71,34 @@ export default {
   destroyed() {
     this.reset();
   },
-
   methods: {
+    switchState() {
+      if (!this.start) {
+        this.reset();
+      }
+      else {
+        if (this.stopped) {
+          this.pause();
+        }
+        else {
+          if (this.result.success) {
+            this.pause();
+          }
+          else {
+            this.action();
+          }
+        }
+      }
+    },
     action() {
+      console.log('action');
       if (this.timer) {
         return;
       }
       this.timer = setInterval(this.startTimer, 10);
     },
     pause() {
+      console.log('pause');
       clearInterval(this.timer);
       this.timer = null;
     },

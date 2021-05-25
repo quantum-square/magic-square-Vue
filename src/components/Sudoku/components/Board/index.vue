@@ -6,8 +6,8 @@
           <Cell
               :control="getCellControl(i,j)"
               @eventCellClick="handleCellClickEvent"
-              @eventMouseOver="handlCellMouseEvent"
-              @eventMouseOut="handlCellMouseEvent"
+              @eventMouseOver="handleCellMouseEvent"
+              @eventMouseOut="handleCellMouseEvent"
               :key="`${i}-${j}`"
           />
         </template>
@@ -55,6 +55,17 @@ export default {
       type: Boolean,
       default: true,
       required: false
+    },
+    boardData: {
+      type: Array,
+      required: false,
+    },
+    indicationToGetCurBoard: {
+      type: Boolean
+    },
+    boardDataLoadedToBoard: {
+      type: Object,
+      default: null,
     }
   },
 
@@ -70,7 +81,7 @@ export default {
   },
   watch: {
     start(val) {
-      if (val == true) {
+      if (val === true) {
         this.initGrid();
         this.sendResult();
       } else {
@@ -79,7 +90,7 @@ export default {
     },
     model: {
       handler: function () {
-        this.cellwriteNumber();
+        this.cellWriteNumber();
         this.sendResult();
       },
       deep: true
@@ -89,6 +100,50 @@ export default {
         // console.log(newValue);
       },
       deep: true
+    },
+    boardData: {
+      handler: function () {
+        console.log('Board know the change', this.boardData);
+        if (this.start && this.solver && !this.stopped) {
+          this.updateAllCells();
+        }
+        console.log('Update success');
+      },
+      deep: true
+    },
+    indicationToGetCurBoard: {
+      handler: function () {
+        console.log('want to get current board in Board');
+
+        let BoardData = [];
+        let disable = [];
+        for (let i = 0; i < this.row; i++) {
+          BoardData[i] = [];
+          disable[i] = [];
+          for (let j = 0; j < this.col; j++) {
+            BoardData[i][j] = this.cells[i*this.row+j].number == null ? 0 : this.cells[i*this.row+j].number;
+            disable[i][j] = this.cells[i*this.row+j].disable ? 1 : 0;
+          }
+        }
+        this.makeCellsUnselected();
+        let obj = {'board':BoardData, 'disable':disable};
+        this.$emit(EVENT.CURRENT_BOARD_FROM_Board, obj);
+      }
+    },
+    // TODO: 可能有问题
+    boardDataLoadedToBoard: {
+      handler: function () {
+        console.log('Board know what to load', this.boardDataLoadedToBoard);
+        this.makeCellsUnselected();
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 9; j++) {
+            this.cells[i*9+j]['disable'] = this.boardDataLoadedToBoard['disable'][i][j] === 1;
+            this.cells[i*9+j]['number'] = this.boardDataLoadedToBoard['board'][i][j] === 0 ? null : this.boardDataLoadedToBoard['board'][i][j];
+          }
+        }
+        console.log(this.cells)
+        this.sendResult();
+      }
     }
   },
   methods: {
@@ -270,7 +325,7 @@ export default {
       });
     },
     //写入选中号码
-    cellwriteNumber() {
+    cellWriteNumber() {
       let {cells, model} = this;
       for (let index = 0; index < cells.length; index++) {
         let cell = cells[index];
@@ -279,7 +334,20 @@ export default {
         cell.number = cell.selected ? number : cell.number;
       }
     },
-
+    // 更新所有cells
+    updateAllCells() {
+      console.log("updateAllCells", this.boardData);
+      this.makeCellsUnselected();
+      if (this.boardData.length === this.col
+          && this.boardData[0].length === this.row) {
+        for (let index = 0; index < this.cells.length; index++) {
+          console.log('hhh')
+          let cell = this.cells[index];
+          cell.number = (!cell.disable && this.boardData[Math.floor(index/this.row)][index%this.row]!==0) ? this.boardData[Math.floor(index/this.row)][index%this.row] : cell.number;
+        }
+        this.sendResult();
+      }
+    },
     showCellSelect(x, y) {
       let {cells} = this;
       for (let index = 0; index < cells.length; index++) {
@@ -295,6 +363,7 @@ export default {
         cell.hover = cell.x == x || cell.y == y ? true : false;
       }
     },
+    // 获得cells中值为0的cell的数量
     getDefectCell() {
       let {cells} = this;
       return cells.reduce((prev, cell) => {
@@ -304,7 +373,7 @@ export default {
         return prev;
       }, 0);
     },
-    handlCellMouseEvent(cell) {
+    handleCellMouseEvent(cell) {
       if (!this.start || this.stopped ||this.solver) return;
       if (cell) {
         if (this.showMouseHover) {
@@ -320,6 +389,12 @@ export default {
       let {x, y} = cell;
       this.showCellSelect(x, y);
       this.$emit(EVENT.CELL_CLICK, cell);
+    },
+    makeCellsUnselected() {
+      for (let index = 0; index < this.cells.length; index++) {
+        let cell = this.cells[index];
+        cell.selected = false;
+      }
     }
   }
 };

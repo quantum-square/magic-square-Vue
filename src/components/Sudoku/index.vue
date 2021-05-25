@@ -10,8 +10,12 @@
         :solver="solver"
         :showMouseHover="showMouseHover"
         :model="boardModel"
+        :boardData="boardData"
         @eventCellClick="handleCellClickEvent"
         @eventSudokuResult="handleResultEvent"
+        :indicationToGetCurBoard="indicationToGetCurBoard"
+        @eventCurrentBoardFromBoard="getCurBoardFromBoard"
+        :boardDataLoadedToBoard="boardDataLoadedToBoard"
     />
     <SelectBar :dimension="9" :start="start&&!stopped&&!solver" @eventNumberClick="handleButtonClick" class="selectBar"/>
 
@@ -23,6 +27,7 @@ import Info from "../Info";
 import Timer from "../Timer";
 import SelectBar from "./components/SelectBar";
 import Board from "./components/Board";
+import EVENT from "../event";
 
 export default {
   components: {
@@ -43,6 +48,8 @@ export default {
         able: false
       }
     };
+  },
+  created() {
   },
   props: {
     config: {
@@ -73,13 +80,27 @@ export default {
       type: Boolean,
       default: true,
       required: false
+    },
+    boardData: {
+      type: Array,
+      required: false,
+    },
+    indicationToGetCurBoard: {
+      type: Boolean
+    },
+    boardDataLoadedToBoard: {
+      type:Object,
+      default: null
     }
   },
   watch: {
     start(val) {
-      if (val == true) {
+      if (val === true) {
         this.boardModel.level = this.config.level;
       }
+      // else {
+      // genxinresult
+      // }
     }
   },
   beforeCreate() {
@@ -88,9 +109,8 @@ export default {
   },
   methods: {
     handleResultEvent(result) {
-      //{total: 15, empty: 14, error: 0, success: false}
       this.result = result;
-      // console.log(result);
+      this.$emit(EVENT.SUDOKU_RESULT, this.result);
     },
     handleCellClickEvent(cell) {
       this.boardModel.selectCell = cell;
@@ -98,6 +118,10 @@ export default {
     },
     handleButtonClick(number) {
       this.boardModel.selectBarNumber = number;
+    },
+    getCurBoardFromBoard(BoardData) {
+      console.log('trigger getCurBoardFromBoard in Sudoku')
+      this.$emit(EVENT.CURRENT_BOARD_FROM_Sudoku, BoardData);
     }
   }
 };
