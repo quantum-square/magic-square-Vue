@@ -10,6 +10,7 @@
               @eventMouseOver="handleCellMouseEvent"
               @eventMouseOut="handleCellMouseEvent"
               :key="`${i}-${j}`"
+              :indicationConstraint="indicationConstraint"
           />
         </template>
       </div>
@@ -74,6 +75,10 @@ export default {
       type: Object,
       default: null,
     },
+    indicationConstraint: {
+      typr: Boolean,
+      default: true,
+    }
   },
 
   data() {
@@ -290,13 +295,15 @@ export default {
         let number =
             model.selectBarNumber > 0 ? model.selectBarNumber : null;
         if (this.stopped) {
-          if (cell.x !== 0 && cell.x !== this.dimension+1 && cell.y !== 0 && cell.y !== this.dimension+1) {
-            cell.number = cell.selected ? number : cell.number;
-            if (cell.selected) {
-              if (number)
-                cell.disable = true;
-              else
-                cell.disable = false;
+          if (!this.indicationConstraint) {
+            if (cell.x !== 0 && cell.x !== this.dimension + 1 && cell.y !== 0 && cell.y !== this.dimension + 1) {
+              cell.number = cell.selected ? number : cell.number;
+              if (cell.selected) {
+                if (number)
+                  cell.disable = true;
+                else
+                  cell.disable = false;
+              }
             }
           }
         }

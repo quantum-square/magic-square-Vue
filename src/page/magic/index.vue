@@ -48,7 +48,7 @@
               Save Puzzle
             </a-button><br/>
             <a-button :disabled="!(!solver && start)" type="primary" class="paper-btn" @click="handleDownload">
-              Download Original Puzzle
+              Download Original
             </a-button>
           </a-space>
         </a-col>
@@ -63,7 +63,9 @@
                  :indicationToGetCurBoard="indicationToGetCurBoard"
                  @eventCurrentBoardFromMagic="getCurBoardFromMagic"
                  @eventSudokuResult="handleResultEvent"
-                 :boardDataLoadedToBoard="boardDataLoadedToBoard"/>
+                 :boardDataLoadedToBoard="boardDataLoadedToBoard"
+                 :indicationConstraint="indicationConstraint"
+          />
         </a-col>
 
       </a-row>
@@ -126,6 +128,7 @@ export default {
       boardDataFromBoard: null,
       result: null,
       boardDataLoadedToBoard: null,
+      indicationConstraint: true,
     };
   },
   mounted() {
@@ -180,6 +183,7 @@ export default {
     handleStartClick() {
       this.start = true;
       this.stopped = true;
+      this.indicationConstraint = false;
 
       if (this.solver) {
         this.getCurBoard();
@@ -208,6 +212,7 @@ export default {
     },
 
     handleContinue() {
+      this.indicationConstraint = true;
       if (this.start) {
         this.stopped = false;
         if (this.taskid !== -1) {

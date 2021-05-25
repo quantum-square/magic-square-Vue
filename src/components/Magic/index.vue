@@ -33,7 +33,9 @@
         :boardData="boardData"
         :indicationToGetCurBoard="indicationToGetCurBoard"
         @eventCurrentBoardFromBoard="getCurBoardFromBoard"
-        :boardDataLoadedToBoard="boardDataLoadedToBoard"/>
+        :boardDataLoadedToBoard="boardDataLoadedToBoard"
+        :indicationConstraint="indicationConstraint"
+    />
 
   </div>
 </template>
@@ -111,6 +113,10 @@ export default {
     boardDataLoadedToBoard: {
       type:Object,
       default: null
+    },
+    indicationConstraint: {
+      type: Boolean,
+      default: true
     }
   },
   watch: {
