@@ -86,16 +86,16 @@ src
 ## UI
 
 ### Magic Square
-![](./img/magic square.png)
+![](./img/magic_square.png)
 
 ### Magic Rule
-![](./img/magic rule.png)
+![](./img/magic_rule.png)
 
 ### Sudoku
 ![](./img/sudoku.png)
 
 ### Sudoku Rule
-![](./img/sudoku rule.png)
+![](./img/sudoku_rule.png)
 
 ## Acknowledgement
 Thanks to [17881055/vue-sudoku](https://github.com/17881055/vue-sudoku). Our work is based on this repository.
