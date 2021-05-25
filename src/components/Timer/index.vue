@@ -50,18 +50,22 @@ export default {
       deep: true
     },
     start(val) {
-      if (val === true) {
-        this.action();
-      } else {
-        this.reset();
-      }
+      console.log("start", val);
+      this.switchState();
+      // if (val === true) {
+      //   this.action();
+      // } else {
+      //   this.reset();
+      // }
     },
     stopped(val) {
-      if (val === true) {
-        this.pause();
-      } else {
-        this.action();
-      }
+      console.log("stopped", val);
+      // if (val === true) {
+      //   this.pause();
+      // } else {
+      //   this.action();
+      // }
+      this.switchState();
     }
   },
   created() {
