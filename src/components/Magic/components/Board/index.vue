@@ -285,11 +285,16 @@ export default {
       for (let index = 0; index < cells.length; index++) {
         let cell = cells[index];
         let number =
-            model.selectBarNumber === "clear" ? null : model.selectBarNumber;
+            model.selectBarNumber > 0 ? model.selectBarNumber : null;
         if (this.stopped) {
-          cell.disable = cell.selected ? true : cell.disable;
           if (cell.x !== 0 && cell.x !== this.dimension+1 && cell.y !== 0 && cell.y !== this.dimension+1) {
-            cell.number = cell.selected ? number : cell.number
+            cell.number = cell.selected ? number : cell.number;
+            if (cell.selected) {
+              if (number)
+                cell.disable = true;
+              else
+                cell.disable = false;
+            }
           }
         }
         else {
