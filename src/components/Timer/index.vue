@@ -50,14 +50,14 @@ export default {
       deep: true
     },
     start(val) {
-      if (val == true) {
+      if (val === true) {
         this.action();
       } else {
         this.reset();
       }
     },
     stopped(val) {
-      if (val == true) {
+      if (val === true) {
         this.pause();
       } else {
         this.action();
@@ -123,4 +123,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.timer{
+  padding-left: 40px;
+}
 </style>

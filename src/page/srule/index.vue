@@ -31,5 +31,6 @@ export default {
 <style scoped>
 .passage {
   font-size: 18px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 </style>

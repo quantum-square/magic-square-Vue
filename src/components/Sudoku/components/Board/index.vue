@@ -147,7 +147,6 @@ export default {
 
       // console.log("gameOver", this.cells);
     },
-
     //判断属于哪个宫 B1,B2,B3...B9
     whichBox(x, y) {
       let r = parseInt(x / 3) + "" + parseInt(y / 3);
@@ -186,13 +185,13 @@ export default {
         ) {
           //   console.log(num, cell.number);
           if (num === cell.number) {
+            // console.log(targetCell.x, targetCell.y, num);
             return false;
           }
         }
       }
       return true;
     },
-
     //生成随机号码串
     randomNumbers(arr = [], length = 1) {
       var result = [];
@@ -203,7 +202,6 @@ export default {
       }
       return result;
     },
-
     //按等级生成随机数字
     generateGame(level = 1) {
       let t = 0;

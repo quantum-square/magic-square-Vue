@@ -54,7 +54,7 @@ export default {
       boardModel: {
         selectCell: null,
         selectBarNumber: null,
-        level:1
+        level: 1
       },
       selectBarModel: {
         able: false
@@ -158,23 +158,23 @@ export default {
 
 .timer {
   position: relative;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
 
   font-size: 18px;
   color: #a8a7a7;
 }
 
 .line {
-  top: -10px;
-  left: 0px;
+  top: -15px;
+  left: 50px;
   width: 800px;
 }
 
 .board {
   position: absolute;
 
-  left: 50px;
+  left: 100px;
   top: 30px;
   width: 600px;
   height: 600px;
@@ -184,7 +184,7 @@ export default {
 
 .big-board {
   position: relative;
-  left: -400px;
+  left: -350px;
   top: -500px;
   width: 1500px;
   height: 1500px;

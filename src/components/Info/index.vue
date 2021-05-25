@@ -1,6 +1,6 @@
 <template>
   <div class="info" v-if="result && start">
-    <span v-if="0 !== result.empty">{{result.empty}}/{{result.total}}</span>
+    <span v-if="0 !== result.empty">{{ result.empty }}/{{ result.total }}</span>
     <template v-if="0 === result.empty">
       <span v-if="result.success">恭喜通关</span>
       <span v-if="result.error">有错误</span>
@@ -16,8 +16,8 @@ export default {
   props: {
     result: {
       type: Object,
-      default: function() {
-        return { total: 0, empty: 0, error: null, success: null };
+      default: function () {
+        return {total: 0, empty: 0, error: null, success: null};
       },
       required: false
     },
@@ -35,9 +35,10 @@ export default {
 .info {
   position: absolute;
   left: 120px;
-  top: 0px;
+  top: 0;
   font-size: 18px;
   font-weight: bold;
   color: #228cbd;
+  padding-left: 100px;
 }
 </style>

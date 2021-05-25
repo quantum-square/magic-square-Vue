@@ -75,7 +75,7 @@ export default {
   },
   watch: {
     start(val) {
-      if (val == true) {
+      if (val === true) {
         this.initGrid();
         this.sendResult();
         if (this.solver) {
