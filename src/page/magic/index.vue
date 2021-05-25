@@ -115,7 +115,7 @@ export default {
       ],
       taskid: -1,
       ws: null,
-      backend_wb_path: 'ws://127.0.0.1:8000/syncBoard/',
+      backend_wb_path: this.TARGET.targetUrl,
       boardDataToBoard: null,
       indicationToGetCurBoard: false,
       boardDataFromBoard: null,
