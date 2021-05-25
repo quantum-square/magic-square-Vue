@@ -5,6 +5,9 @@ import 'ant-design-vue/dist/antd.css';
 import router from './router'
 import axios from "axios";
 import VueAxios from 'vue-axios'
+import target from '@/global/constUtils'
+
+Vue.prototype.TARGET = target
 
 Vue.use(Antd);
 Vue.config.productionTip = false
