@@ -250,7 +250,12 @@ export default {
       let that = this;
       const selectedFile = this.$refs.refFile.files[0];
       const reader = new FileReader();
-      reader.readAsText(selectedFile);
+      try {
+        reader.readAsText(selectedFile);
+      }
+      catch (e) {
+        message.error(e);
+      }
       reader.onload = function() {
         try {
           let data = this.result;
@@ -356,8 +361,8 @@ export default {
     createTask() {
       let boarddata = this.boardDataFromBoard['board'];
       let disable = this.boardDataFromBoard['disable'];
-      for (let i = 0; i < this.dimension; i++) {
-        for (let j = 0; j < this.dimension; j++) {
+      for (let i = 0; i < boarddata.length; i++) {
+        for (let j = 0; j < boarddata[i].length; j++) {
           if (disable[i][j] === 0) {
             boarddata[i][j] = 0;
           }
