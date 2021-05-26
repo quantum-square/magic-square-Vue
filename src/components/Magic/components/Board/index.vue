@@ -133,7 +133,7 @@ export default {
     indicationToGetCurBoard: {
       handler: function () {
         console.log('want to get current board in Board');
-
+        
         let BoardData = [];
         let disable = [];
         for (let i = 0; i < this.dimension; i++) {
@@ -153,8 +153,8 @@ export default {
       handler: function () {
         console.log('Board know what to load', this.boardDataLoadedToBoard);
         this.makeCellsUnselected();
-        for (let i = 0; i < 9; i++) {
-          for (let j = 0; j < 9; j++) {
+        for (let i = 0; i < this.dimension; i++) {
+          for (let j = 0; j < this.dimension; j++) {
             this.cells[(i+1)*(this.dimension+2)+j+1]['disable'] = this.boardDataLoadedToBoard['disable'][i][j] === 1;
             this.cells[(i+1)*(this.dimension+2)+j+1]['number'] = this.boardDataLoadedToBoard['board'][i][j] === 0 ? null : this.boardDataLoadedToBoard['board'][i][j];
           }

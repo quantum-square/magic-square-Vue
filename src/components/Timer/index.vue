@@ -92,7 +92,7 @@ export default {
       if (this.timer) {
         return;
       }
-      this.timer = setInterval(this.startTimer, 10);
+      this.timer = setInterval(this.startTimer, 100);
     },
     pause() {
       console.log('pause');
@@ -113,7 +113,7 @@ export default {
     },
     startTimer() {
       this.millisecond += 1;
-      if (this.millisecond >= 100) {
+      if (this.millisecond >= 10) {
         this.millisecond = 0;
         this.seconds = this.seconds + 1;
       }
@@ -134,8 +134,8 @@ export default {
           ":" +
           (this.seconds < 10 ? "0" + this.seconds : this.seconds) +
           "." +
-          (this.millisecond < 10 ? "0" + this.millisecond : this.millisecond) +
-          parseInt(Math.random() * 10);
+          (this.millisecond < 10 ? this.millisecond : this.millisecond) +
+          parseInt(Math.random() * 10) + "0";
     }
   }
 };

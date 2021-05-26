@@ -100,7 +100,7 @@ export default {
       value: null,
       showMouseHover: true,
       dimension: {
-        value: 10,
+        value: 9,
       },
       headers: {
         authorization: 'authorization-text',
@@ -287,8 +287,8 @@ export default {
       this.getCurBoard();
       this.$nextTick(function () {
         let data = that.boardDataFromBoard;
-        for (let i = 0; i < 9; i++) {
-          for (let j = 0; j < 9; j++) {
+        for (let i = 0; i < this.dimension; i++) {
+          for (let j = 0; j < this.dimension; j++) {
             if (data['disable'][i][j] === 0) {
               data['board'][i][j] = 0;
             }
@@ -356,8 +356,8 @@ export default {
     createTask() {
       let boarddata = this.boardDataFromBoard['board'];
       let disable = this.boardDataFromBoard['disable'];
-      for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
+      for (let i = 0; i < this.dimension; i++) {
+        for (let j = 0; j < this.dimension; j++) {
           if (disable[i][j] === 0) {
             boarddata[i][j] = 0;
           }

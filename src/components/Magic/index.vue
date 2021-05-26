@@ -1,9 +1,9 @@
 <template>
   <div class="main">
     <a-row>
-      <a-col :span="5">
+      <!-- <a-col :span="5">
         <Timer :start="start" :stopped="stopped" :result="result" class="timer"/>
-      </a-col>
+      </a-col> -->
       <a-col :span="13">
         <Info :start="start" :result="result" class="info"/>
       </a-col>
@@ -42,7 +42,7 @@
 
 <script>
 import Info from "../Info";
-import Timer from "../Timer";
+// import Timer from "../Timer";
 import Board from "./components/Board";
 import EVENT from "../event";
 
@@ -50,7 +50,7 @@ import EVENT from "../event";
 export default {
   components: {
     Board,
-    Timer,
+    // Timer,
     Info
   },
   data() {

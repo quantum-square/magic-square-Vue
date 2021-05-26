@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <Timer :start="start" :stopped="stopped" :result="result" class="timer"/>
+    <!-- <Timer :start="start" :stopped="stopped" :result="result" class="timer" /> -->
     <Info :start="start" :result="result" class="info"/>
     <a-divider class="line-sudoku"></a-divider>
     <Board
@@ -24,7 +24,7 @@
 
 <script>
 import Info from "../Info";
-import Timer from "../Timer";
+// import Timer from "../Timer";
 import SelectBar from "./components/SelectBar";
 import Board from "./components/Board";
 import EVENT from "../event";
@@ -33,7 +33,7 @@ export default {
   components: {
     SelectBar,
     Board,
-    Timer,
+    // Timer,
     Info
   },
   data() {
